@@ -1,5 +1,8 @@
-(function(){
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 "use strict";
+const SUPABASE_URL = "https://qjepdqhydoniwqxvoolw.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Vn6A7Rn2hFyTG6CWn46XRg_kdo_xgU5";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const T={
 uk:{
 skip:"Перейти до змісту",navLabel:"Головна навігація",menu:"Меню",
@@ -296,14 +299,23 @@ form.addEventListener("change",()=>{if(form.dataset.tried)validate(false);});
 function buildMessage(){const v=values(),d=T[lang];
   const lines=[d.mHead,"",`${d.mDir}: ${d.dirs[v.direction]||""}`,`${d.mLevel}: ${$("level").selectedOptions[0]?.textContent||""}`,`${d.mGoal}: ${v.goal}`,`${d.mMethod}: ${$("method").selectedOptions[0]?.textContent||""}`,`${d.mContact}: ${v.contact}`];
   if(v.comment)lines.push(`${d.mComment}: ${v.comment}`);msgEl.textContent=lines.join("\n");return v;}
-/* TODO(supabase): BookingAdapter.send currently only has a manual-copy fallback (no endpoint configured).
-   Replace with an `insert` into the `bookings` table via the Supabase client, which also triggers the
-   DB webhook/Edge Function that emails Maria through Resend. See docs/supabase-integration.md. */
-const BookingAdapter={endpoint:null,async send(payload){if(!this.endpoint)return{ok:false,reason:"not_configured"};
-  const r=await fetch(this.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});return{ok:r.ok};}};
+/* ---------- Supabase-backed booking ---------- */
+const BookingAdapter={async send(payload){
+  const {error}=await supabase.from("bookings").insert({
+    student_id:session?.user?.id??null,
+    practice_type:payload.direction||null,
+    message:[payload.goal?`${T[lang].lGoal}: ${payload.goal}`:"",payload.comment].filter(Boolean).join(" — ")||null,
+    contact_name:payload.contact,
+    contact_phone:payload.method==="whatsapp"?payload.contact:null,
+    contact_instagram:(payload.method==="instagram"||payload.method==="telegram")?payload.contact:null,
+    contact_email:payload.method==="email"?payload.contact:null
+  });
+  return{ok:!error,error};}};
 let busy=false;
 form.addEventListener("submit",async e=>{e.preventDefault();if(busy)return;form.dataset.tried="1";if(!validate(true))return;
-  busy=true;const payload=buildMessage();await BookingAdapter.send({...payload,lang});busy=false;
+  busy=true;const payload=buildMessage();const r=await BookingAdapter.send({...payload,lang});busy=false;
+  const h3=result.querySelector("h3"),p=result.querySelector("p");
+  h3.textContent=a(r.ok?"reqSentTitle":"reqErrTitle");p.textContent=a(r.ok?"reqSentText":"reqErrText");
   form.hidden=true;result.hidden=false;$("copied").textContent="";result.focus({preventScroll:true});result.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});relayout();});
 $("editBtn").addEventListener("click",()=>{result.hidden=true;form.hidden=false;$("submitBtn").focus();relayout();});
 $("copyBtn").addEventListener("click",()=>{const ok=()=>{$("copied").textContent=T[lang].copied;};
@@ -322,29 +334,30 @@ function apply(l){lang=l;const d=T[l];
   relayout();}
 
 
-/* ---------- account (prototype): sign-up and sign-in, profile, student area; Maria's panel at #infinitylove.
-   Demo storage: everything lives in this browser only. The production site replaces this store with
-   Supabase Auth + Postgres row-level security + private storage (see the security plan). ---------- */
+/* ---------- account: real Supabase Auth + Postgres (RLS) behind the same UI the prototype sketched.
+   Maria's panel lives at #infinitylove and requires an admin profile + a verified TOTP (aal2) session. ---------- */
 const A={
 uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_profile:"Ваші дані та зв'язок з Марією",sub_book:"Вільні дати та ваші заявки",sub_study:"Заняття та історія відвідувань",sub_knowledge:"Матеріали від Марії",sub_reviews:"Кілька слів для Марії",sub_messages:"Пряма переписка з Марією",pData:"Особисті дані",pStatus:"Статус",mailOk:"Пошта закріплена за профілем: Марія відповідатиме на неї.",mailWhy:"Підтвердіть пошту, щоб писати Марії з профілю.",joinNote:"Після реєстрації Марія побачить ваш профіль і відкриє статус учениці.",signIn:"Вхід",signUp:"Реєстрація",createAcc:"Створити акаунт",name:"Ім'я",password:"Пароль",
-  demoNote:"Демо-режим: акаунти й дані зберігаються лише в цьому браузері. Справжні акаунти запрацюють після підключення сервера.",
+  signupCheckEmail:"Перевірте пошту: ми надіслали лист із посиланням для підтвердження акаунту.",
+  reqSentTitle:"Заявку надіслано",reqSentText:"Марія отримала вашу заявку і зв'яжеться з вами найближчим часом.",
+  reqErrTitle:"Не вдалося надіслати",reqErrText:"Спробуйте ще раз або напишіть напряму в Instagram.",
   eName:"Вкажіть ім'я.",eEmail:"Перевірте email.",ePass:"Пароль: щонайменше 8 символів.",eTaken:"Цей email уже зареєстровано.",eWrong:"Невірний email або пароль.",
   student:"Учениця",registered:"Зареєстрована",verified:"Пошту підтверджено",myProfile:"Мій профіль",logout:"Вийти",close:"Закрити",
   t_profile:"Профіль",t_book:"Запис",t_study:"Навчання",t_knowledge:"Знання",t_reviews:"Відгуки",t_messages:"Повідомлення",
-  changeAv:"Змінити аватар",social:"Instagram або інша соцмережа",socialPh:"@нікнейм або посилання",verifyEmail:"Підтвердити пошту",save:"Зберегти",saved:"Збережено",
-  verifySent:"Демо: пошту підтверджено. На сайті прийде лист із посиланням.",
+  changeAv:"Змінити аватар",social:"Instagram або інша соцмережа",socialPh:"@нікнейм або посилання",verifyEmail:"Надіслати лист повторно",save:"Зберегти",saved:"Збережено",
+  verifySent:"Лист надіслано повторно.",
   quickBook:"Швидкий запис",quickBookNote:"Оберіть вільну дату. Контакт уже збережено в профілі, Марія підтвердить запис.",direction:"Напрям",comment:"Коментар",
   bookBtn:"Записатися",ePickSlot:"Оберіть дату.",noSlots:"Марія ще не відкрила вільні дати. Загляньте пізніше або напишіть їй.",myRequests:"Мої заявки",
-  st_new:"очікує",st_confirmed:"підтверджено",st_declined:"відхилено",booked:"Заявку надіслано Марії",
+  st_pending:"очікує",st_confirmed:"підтверджено",st_declined:"відхилено",st_cancelled:"скасовано",booked:"Заявку надіслано Марії",
   studentOnly:"Тільки для учениць",studyLock:"Розділ з'явиться, коли Марія прийме вас ученицею.",knowLock:"Матеріали Марії відкриваються ученицям.",
   upcoming:"Найближчі заняття",history:"Історія відвідувань",visits:"Відвідано занять: ",noUpcoming:"Поки немає запланованих занять.",noHistory:"Історія з'явиться після першого заняття.",
   noMaterials:"Марія ще не додала матеріали.",awaitAccess:"доступ відкриє Марія",
-  yourReview:"Ваш відгук для Марії",sendReview:"Надіслати відгук",eEmpty:"Напишіть кілька слів.",rev_pub:"опубліковано",rev_pending:"на модерації",reviewSent:"Відгук надіслано на модерацію",
+  yourReview:"Ваш відгук для Марії",sendReview:"Надіслати відгук",eEmpty:"Напишіть кілька слів.",rev_pub:"опубліковано",rev_pending:"на модерації",rev_rejected:"не опубліковано",reviewSent:"Відгук надіслано на модерацію",
   msgVerifyFirst:"Підтвердіть пошту в профілі, і тоді зможете писати Марії без введення email: він закріпиться за вами.",
   msgPh:"Повідомлення для Марії",send:"Надіслати",msgFrom:"Відповідь прийде на ",you:"Ви",maria:"Марія",msgSent:"Повідомлення надіслано",
   revsTitle:"Відгуки учениць",
-  adm:"Кабінет Марії",admLogin:"Логін",admPass:"Пароль",adm2fa:"Код 2FA",admEnter:"Увійти",
-  admNote:"Демо-панель. На справжньому сайті вхід перевіряє сервер: пароль і одноразовий код із застосунку-автентифікатора, обмеження спроб. Тут будь-які дані відкривають демо.",
+  adm:"Кабінет Марії",admLogin:"Email",admPass:"Пароль",adm2fa:"Код з застосунку-автентифікатора",admEnter:"Увійти",admVerify:"Підтвердити",
+  mfaSetupTitle:"Налаштуйте двофакторний вхід",mfaSetupHint:"Відскануйте QR-код застосунком-автентифікатором (Google Authenticator, Authy тощо), потім введіть 6-значний код.",mfaSecretFallback:"Якщо не можете сканувати QR — введіть цей код вручну:",mfaWrong:"Невірний код. Спробуйте ще раз.",mfaBadLogin:"Невірний email або пароль.",mfaNotAdmin:"Цей акаунт не має прав адміністраторки.",
   a_students:"Учениці",a_training:"Тренування",a_slots:"Вільні дати",a_messages:"Повідомлення",a_reviews:"Відгуки",a_knowledge:"Знання",
   noUsers:"Поки ніхто не зареєструвався.",makeStudent:"Зробити ученицею",unStudent:"Зняти статус",
   requests:"Нові заявки",noRequests:"Нових заявок немає.",confirm:"Підтвердити",decline:"Відхилити",assign:"Призначити тренування",who:"Учениця",when:"Дата й час",add:"Додати",remove:"Прибрати",
@@ -353,24 +366,26 @@ uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_prof
   matTitle:"Назва",matText:"Текст",matImage:"Фото",addMat:"Додати матеріал",access:"Доступ",noStudents:"Ще немає учениць.",
   eFill:"Заповніть поля.",done:"Готово"},
 en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and your line to Maria",sub_book:"Free dates and your requests",sub_study:"Sessions and attendance history",sub_knowledge:"Materials from Maria",sub_reviews:"A few words for Maria",sub_messages:"Direct messages with Maria",pData:"Personal details",pStatus:"Status",mailOk:"Your email is attached to the profile: Maria replies to it.",mailWhy:"Confirm your email to message Maria from your profile.",joinNote:"After you sign up, Maria sees your profile and grants you student status.",signIn:"Sign in",signUp:"Sign up",createAcc:"Create account",name:"Name",password:"Password",
-  demoNote:"Demo mode: accounts and data are stored only in this browser. Real accounts will work once the server is connected.",
+  signupCheckEmail:"Check your email: we've sent a confirmation link.",
+  reqSentTitle:"Request sent",reqSentText:"Maria has received your request and will get back to you soon.",
+  reqErrTitle:"Couldn't send it",reqErrText:"Please try again, or message Maria directly on Instagram.",
   eName:"Enter your name.",eEmail:"Check the email.",ePass:"Password: at least 8 characters.",eTaken:"This email is already registered.",eWrong:"Wrong email or password.",
   student:"Student",registered:"Registered",verified:"Email confirmed",myProfile:"My profile",logout:"Sign out",close:"Close",
   t_profile:"Profile",t_book:"Booking",t_study:"Training",t_knowledge:"Knowledge",t_reviews:"Reviews",t_messages:"Messages",
-  changeAv:"Change avatar",social:"Instagram or another social network",socialPh:"@handle or link",verifyEmail:"Confirm email",save:"Save",saved:"Saved",
-  verifySent:"Demo: email confirmed. On the live site a link arrives by email.",
+  changeAv:"Change avatar",social:"Instagram or another social network",socialPh:"@handle or link",verifyEmail:"Resend the email",save:"Save",saved:"Saved",
+  verifySent:"Email sent again.",
   quickBook:"Quick booking",quickBookNote:"Pick a free date. Your contact is already in your profile; Maria will confirm.",direction:"Direction",comment:"Comment",
   bookBtn:"Book",ePickSlot:"Pick a date.",noSlots:"Maria hasn't opened free dates yet. Check back later or message her.",myRequests:"My requests",
-  st_new:"pending",st_confirmed:"confirmed",st_declined:"declined",booked:"Request sent to Maria",
+  st_pending:"pending",st_confirmed:"confirmed",st_declined:"declined",st_cancelled:"cancelled",booked:"Request sent to Maria",
   studentOnly:"Students only",studyLock:"This section appears once Maria accepts you as her student.",knowLock:"Maria's materials open to her students.",
   upcoming:"Upcoming sessions",history:"Attendance history",visits:"Sessions attended: ",noUpcoming:"No sessions scheduled yet.",noHistory:"History appears after your first session.",
   noMaterials:"Maria hasn't added materials yet.",awaitAccess:"Maria will open access",
-  yourReview:"Your review for Maria",sendReview:"Send review",eEmpty:"Write a few words.",rev_pub:"published",rev_pending:"in moderation",reviewSent:"Review sent for moderation",
+  yourReview:"Your review for Maria",sendReview:"Send review",eEmpty:"Write a few words.",rev_pub:"published",rev_pending:"in moderation",rev_rejected:"not published",reviewSent:"Review sent for moderation",
   msgVerifyFirst:"Confirm your email in the profile, then you can message Maria without typing it: it stays attached to you.",
   msgPh:"Message to Maria",send:"Send",msgFrom:"Replies go to ",you:"You",maria:"Maria",msgSent:"Message sent",
   revsTitle:"Students' reviews",
-  adm:"Maria's panel",admLogin:"Login",admPass:"Password",adm2fa:"2FA code",admEnter:"Sign in",
-  admNote:"Demo panel. On the live site the server checks the login: password plus a one-time code from an authenticator app, with attempt limits. Here any input opens the demo.",
+  adm:"Maria's panel",admLogin:"Email",admPass:"Password",adm2fa:"Code from your authenticator app",admEnter:"Sign in",admVerify:"Confirm",
+  mfaSetupTitle:"Set up two-factor sign-in",mfaSetupHint:"Scan this QR code with an authenticator app (Google Authenticator, Authy, etc.), then enter the 6-digit code.",mfaSecretFallback:"Can't scan it? Enter this code by hand:",mfaWrong:"Wrong code. Try again.",mfaBadLogin:"Wrong email or password.",mfaNotAdmin:"This account does not have admin rights.",
   a_students:"Students",a_training:"Training",a_slots:"Free dates",a_messages:"Messages",a_reviews:"Reviews",a_knowledge:"Knowledge",
   noUsers:"Nobody has signed up yet.",makeStudent:"Make student",unStudent:"Remove status",
   requests:"New requests",noRequests:"No new requests.",confirm:"Confirm",decline:"Decline",assign:"Assign a session",who:"Student",when:"Date and time",add:"Add",remove:"Remove",
@@ -379,37 +394,56 @@ en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and 
   matTitle:"Title",matText:"Text",matImage:"Photo",addMat:"Add material",access:"Access",noStudents:"No students yet.",
   eFill:"Fill in the fields.",done:"Done"}};
 const a=k=>A[lang][k]??k;
-/* TODO(supabase): this whole demo store (DKEY, blank(), db, persist()) is a stand-in for Supabase.
-   Replace with: Supabase Auth (sign up/in, email confirmation, MFA for admin) for `users`/session,
-   and Postgres tables (slots, bookings, lessons, messages, reviews, materials) behind RLS for everything
-   below. Nothing here should ship to production as-is. */
-const DKEY="mb-demo-v1";
-const blank=()=>({users:[],session:null,slots:[],sessions:[],requests:[],messages:[],reviews:[],materials:[]});
-let db=blank();
-try{const raw=localStorage.getItem(DKEY);if(raw)db=Object.assign(blank(),JSON.parse(raw));}catch(e){}
-const persist=()=>{try{localStorage.setItem(DKEY,JSON.stringify(db));}catch(e){toast("Storage is full or blocked");}};
-const nid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
-const me=()=>db.users.find(u=>u.id===db.session)||null;
-const userById=id=>db.users.find(u=>u.id===id);
+
+/* ---------- session + profile cache (the only synchronous "current user" source) ---------- */
+let session=null,profileRow=null,avatarUrl="";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-async function pwHash(email,p){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("mb|"+email+"|"+p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}catch(e){return "x"+btoa(unescape(encodeURIComponent(email+p)));}}
 const fmt=iso=>new Date(iso).toLocaleString(lang==="uk"?"uk-UA":"en-GB",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
 const future=iso=>new Date(iso).getTime()>Date.now();
 const dirName=k=>T[lang].dirs[k]||k;
 const dirOptions=()=>Object.keys(T[lang].dirs).map(k=>`<option value="${k}">${esc(dirName(k))}</option>`).join("");
 const ICON_USER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.2-5.2 7.5-5.2s6.1 1.6 7.5 5.2"/></svg>';
 const ICON_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/></svg>';
+function me(){if(!session||!profileRow)return null;
+  return{id:profileRow.id,name:profileRow.full_name||session.user.email,email:session.user.email,avatar:avatarUrl,social:profileRow.instagram||"",verified:!!session.user.email_confirmed_at,student:!!profileRow.is_student,role:profileRow.role};}
 const avHTML=(u,cls="")=>`<span class="av ${cls}">${u&&u.avatar?`<img src="${u.avatar}" alt="" draggable="false">`:u?esc(((u.name||"?").trim()[0]||"?").toUpperCase()):ICON_USER}</span>`;
 const statusPill=u=>u.student?`<span class="pill red">${a("student")}</span>`:`<span class="pill">${a("registered")}</span>`;
 const lockHTML=(t,h)=>`<div class="lock">${ICON_LOCK}<strong>${esc(t)}</strong><span class="note">${esc(h)}</span></div>`;
 const emptyNote=t=>`<p class="note">${esc(t)}</p>`;
 function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;t.classList.remove("show");void t.offsetWidth;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>{t.hidden=true;},2600);}
-/* TODO(supabase): avatar/material images are read as base64 data URLs into localStorage here.
-   Replace with an upload to a private Supabase Storage bucket and store the resulting path; render
-   with a short-lived signed URL instead of a data URL. */
-function readImg(file,max){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{
-  const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
-  c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.85));};im.src=fr.result;};fr.readAsDataURL(file);});}
+
+async function loadProfile(){
+  if(!session){profileRow=null;avatarUrl="";return;}
+  const{data}=await supabase.from("profiles").select("*").eq("id",session.user.id).single();
+  profileRow=data||null;avatarUrl="";
+  if(profileRow&&profileRow.avatar_url){
+    const{data:signed}=await supabase.storage.from("avatars").createSignedUrl(profileRow.avatar_url,3600);
+    avatarUrl=signed?.signedUrl||"";
+  }
+}
+async function initAuth(){
+  const{data:{session:s}}=await supabase.auth.getSession();session=s;await loadProfile();acctRefresh();
+  supabase.auth.onAuthStateChange(async(_event,s2)=>{session=s2;await loadProfile();acctRefresh();});
+}
+
+/* ---------- image upload: a private Storage path, resolved to a short-lived signed URL at render time ---------- */
+function extOf(file){const m=/\.([a-z0-9]+)$/i.exec(file.name||"");return(m?m[1]:"jpg").toLowerCase();}
+async function uploadAvatar(file){
+  const path=`${session.user.id}/avatar.${extOf(file)}`;
+  const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true,contentType:file.type||"image/jpeg"});
+  if(error)return{ok:false,error};
+  await supabase.from("profiles").update({avatar_url:path}).eq("id",session.user.id);
+  await loadProfile();return{ok:true};
+}
+async function uploadMaterialImage(file){
+  const path=`${Date.now()}-${(file.name||"image").replace(/[^a-z0-9_.-]/gi,"_")}`;
+  const{error}=await supabase.storage.from("materials").upload(path,file,{contentType:file.type||"image/jpeg"});
+  return error?{ok:false,error}:{ok:true,path};
+}
+async function signedMaterialUrl(path){
+  const{data}=await supabase.storage.from("materials").createSignedUrl(path,3600);
+  return data?.signedUrl||"";
+}
 const dlgOpen=d=>{if(!d.open){d.classList.remove("closing");document.documentElement.classList.add("modal-open");if(d.showModal)d.showModal();else d.setAttribute("open","");}};
 function softClose(d){if(!d.open||d.classList.contains("closing"))return;if(reduce){d.close();return;}
   d.classList.add("closing");setTimeout(()=>{d.classList.remove("closing");d.close();},440);}
@@ -418,9 +452,10 @@ document.querySelectorAll("dialog.dlg").forEach(d=>{d.addEventListener("cancel",
 
 /* ----- nav avatar and the small centred card ----- */
 const acct=$("acct"),prof=$("prof"),adm=$("adm"),avBtn=$("avatarBtn");
-let authTab="in",profTab="profile",admTab="students",admOk=false;
+let authTab="in",profTab="profile",admTab="students",admOk=false,admStep="creds",admFactorId=null,admChallengeId=null,admTotp=null,signupPending=false;
 function renderNav(){const u=me();avBtn.innerHTML=avHTML(u);avBtn.classList.toggle("on",!!u);avBtn.setAttribute("aria-label",u?`${a("acct")}: ${u.name}`:a("acct"));}
 function renderAcct(){const u=me(),v=$("acctBody");
+  if(signupPending){v.innerHTML=`<p class="mono eyebrow">${a("acctEyebrow")}</p><h3>${a("signUp")}</h3><p class="note">${a("signupCheckEmail")}</p>`;return;}
   if(!u){v.innerHTML=`<p class="mono eyebrow">${a("acctEyebrow")}</p><h3 id="acctTitle">${authTab==="in"?a("signIn"):a("signUp")}</h3>
     <div class="seg2" role="group"><button type="button" data-a="tab-in" aria-pressed="${authTab==="in"}">${a("signIn")}</button><button type="button" data-a="tab-up" aria-pressed="${authTab==="up"}">${a("signUp")}</button></div>
     <form id="authForm" novalidate>
@@ -429,10 +464,10 @@ function renderAcct(){const u=me(),v=$("acctBody");
       <div class="field"><label class="lbl" for="au-pass">${a("password")}</label><input type="password" id="au-pass" autocomplete="${authTab==="up"?"new-password":"current-password"}" maxlength="128"></div>
       <div class="err" id="au-err" role="alert"></div>
       <button class="glass" type="submit">${authTab==="in"?a("signIn"):a("createAcc")}<span class="arr">→</span></button>
-    </form>${joinIntent&&authTab==="up"?`<p class="note join-note">${a("joinNote")}</p>`:""}<p class="note">${a("demoNote")}</p>`;return;}
+    </form>${joinIntent&&authTab==="up"?`<p class="note join-note">${a("joinNote")}</p>`:""}`;return;}
   v.innerHTML=`<p class="mono eyebrow">${a("acctEyebrow")}</p><div class="mini-prof">${avHTML(u,"lg")}<div class="mp-txt"><h3 id="acctTitle">${esc(u.name)}</h3><div class="row">${statusPill(u)}${u.verified?`<span class="pill">${a("verified")}</span>`:""}</div><p class="note">${esc(u.email)}</p></div></div>
     <div class="row" style="margin-top:22px"><button class="glass" type="button" data-a="open-prof">${a("myProfile")}<span class="arr">→</span></button><button class="txt-btn" type="button" data-a="logout">${a("logout")}</button></div>`;}
-avBtn.addEventListener("click",()=>{joinIntent=false;renderAcct();dlgOpen(acct);});
+avBtn.addEventListener("click",()=>{joinIntent=false;signupPending=false;renderAcct();dlgOpen(acct);});
 /* "become a student" in the booking form: registration first; Maria grants the status afterwards */
 let joinIntent=false;
 $("joinBtn").addEventListener("click",()=>{if(me()){profTab="profile";renderProf();dlgOpen(prof);return;}authTab="up";joinIntent=true;renderAcct();dlgOpen(acct);});
@@ -448,7 +483,7 @@ const PICON={
   reviews:'<path d="M12 4.5l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z"/>',
   messages:'<path d="M5 6.5h14v9H10l-4 3v-3H5z"/>'};
 const picon=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${PICON[k]}</svg>`;
-function renderProf(){const u=me();if(!u){prof.close();return;}
+async function renderProf(){const u=me();if(!u){prof.close();return;}
   const locked=k=>(k==="study"||k==="knowledge")&&!u.student;
   $("profSide").innerHTML=`<div class="side-id">
       <div class="av-wrap">${avHTML(u,"xl")}<label class="av-cam" for="avFile" title="${a("changeAv")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4.5 8.5h3l1.5-2h6l1.5 2h3v10h-15z"/><circle cx="12" cy="13" r="3.2"/></svg><span class="sr">${a("changeAv")}</span></label><input type="file" id="avFile" accept="image/*" hidden></div>
@@ -457,179 +492,246 @@ function renderProf(){const u=me();if(!u){prof.close();return;}
     <nav class="vtabs" role="tablist" aria-label="${a("myProfile")}">${PTABS.map(k=>`<button type="button" role="tab" data-a="ptab" data-k="${k}" aria-selected="${profTab===k}">${picon(k)}<span>${a("t_"+k)}</span>${locked(k)?`<i class="lk">${ICON_LOCK}</i>`:""}</button>`).join("")}</nav>
     <button type="button" class="txt-btn side-out" data-a="logout">${a("logout")}</button>`;
   $("profTitle").innerHTML=`<p class="mono eyebrow">${a("myProfile")}</p><h3>${a("t_"+profTab)}</h3><p class="note">${a("sub_"+profTab)}</p>`;
-  const html=PANE[profTab](u);
+  const html=await PANE[profTab](u);
   $("profPane").innerHTML=(profTab==="profile"||profTab==="knowledge"||html.startsWith('<div class="lock"'))?html:`<div class="pcard">${html}</div>`;}
 const PANE={
-profile:u=>`<div class="pcards">
+profile:async u=>`<div class="pcards">
   <form id="profForm" class="pcard" novalidate><h4>${a("pData")}</h4>
     <div class="row2"><div class="field"><label class="lbl" for="pf-name">${a("name")}</label><input type="text" id="pf-name" maxlength="60" value="${esc(u.name)}"></div>
     <div class="field"><label class="lbl" for="pf-social">${a("social")}</label><input type="text" id="pf-social" maxlength="120" placeholder="${a("socialPh")}" value="${esc(u.social)}"></div></div>
     <div class="pc-foot"><button class="glass sm" type="submit">${a("save")}</button></div></form>
   <div class="pcard"><h4>Email</h4><div class="pc-row"><span class="pc-val">${esc(u.email)}</span>${u.verified?`<span class="pill">${a("verified")}</span>`:`<button type="button" class="glass sm" data-a="verify">${a("verifyEmail")}</button>`}</div>
     <p class="note">${u.verified?a("mailOk"):a("mailWhy")}</p></div>
-  <div class="pcard ${u.student?"is-student":""}"><h4>${a("pStatus")}</h4><div class="pc-row">${statusPill(u)}<span class="note">${u.student?a("visits")+db.sessions.filter(s=>s.userId===u.id&&!future(s.date)).length:a("joinNote")}</span></div></div>
+  <div class="pcard ${u.student?"is-student":""}"><h4>${a("pStatus")}</h4><div class="pc-row">${statusPill(u)}</div><p class="note">${u.student?"":a("joinNote")}</p></div>
 </div>`,
-book:u=>{const free=db.slots.filter(s=>future(s.date)&&!db.requests.some(r=>r.slotId===s.id&&r.status!=="declined")).sort((x,y)=>x.date.localeCompare(y.date));
-  const mine=db.requests.filter(r=>r.userId===u.id).sort((x,y)=>y.created.localeCompare(x.created));
+book:async u=>{
+  const[{data:slots}, {data:mine}]=await Promise.all([
+    supabase.from("slots").select("*").eq("is_open",true).gt("starts_at",new Date().toISOString()).order("starts_at"),
+    supabase.from("bookings").select("*").eq("student_id",u.id).order("created_at",{ascending:false})
+  ]);
+  const free=slots||[],mineList=mine||[];
   return `<h4>${a("quickBook")}</h4><p class="note">${a("quickBookNote")}</p>
-  ${free.length?`<form id="qbForm" novalidate><div class="slots" role="radiogroup">${free.map(s=>`<label class="slot"><input type="radio" name="slot" value="${s.id}"><span class="glass sm">${esc(fmt(s.date))}</span></label>`).join("")}</div>
+  ${free.length?`<form id="qbForm" novalidate><div class="slots" role="radiogroup">${free.map(s=>`<label class="slot"><input type="radio" name="slot" value="${s.id}"><span class="glass sm">${esc(fmt(s.starts_at))}</span></label>`).join("")}</div>
     <div class="row2"><div class="field"><label class="lbl" for="qbDir">${a("direction")}</label><select id="qbDir">${dirOptions()}</select></div>
     <div class="field"><label class="lbl" for="qbNote">${a("comment")}</label><input type="text" id="qbNote" maxlength="300"></div></div>
     <div class="err" id="qbErr" role="alert"></div><button class="glass" type="submit">${a("bookBtn")}<span class="arr">→</span></button></form>`:`<p class="note pc-empty">${a("noSlots")}</p>`}
-  ${mine.length?`<h4>${a("myRequests")}</h4><ul class="list">${mine.map(r=>{const s=db.slots.find(x=>x.id===r.slotId);return `<li class="item"><span>${s?esc(fmt(s.date)):"—"} · ${esc(dirName(r.dir))}</span><span class="pill ${r.status==="confirmed"?"red":""}">${a("st_"+r.status)}</span></li>`;}).join("")}</ul>`:""}`;},
-study:u=>{if(!u.student)return lockHTML(a("studentOnly"),a("studyLock"));
-  const mine=db.sessions.filter(s=>s.userId===u.id),up=mine.filter(s=>future(s.date)).sort((x,y)=>x.date.localeCompare(y.date)),past=mine.filter(s=>!future(s.date)).sort((x,y)=>y.date.localeCompare(x.date));
-  const li=s=>`<li class="item"><span>${esc(fmt(s.date))}</span><span class="pill">${esc(dirName(s.dir))}</span></li>`;
+  ${mineList.length?`<h4>${a("myRequests")}</h4><ul class="list">${mineList.map(r=>`<li class="item"><span>${esc(dirName(r.practice_type))}${r.message?` · «${esc(r.message)}»`:""}</span><span class="pill ${r.status==="confirmed"?"red":""}">${a("st_"+r.status)}</span></li>`).join("")}</ul>`:""}`;},
+study:async u=>{if(!u.student)return lockHTML(a("studentOnly"),a("studyLock"));
+  const{data}=await supabase.from("lessons").select("*, slots(starts_at)").eq("student_id",u.id);
+  const mine=data||[],up=mine.filter(s=>s.status==="scheduled").sort((x,y)=>new Date(x.slots?.starts_at||0)-new Date(y.slots?.starts_at||0)),past=mine.filter(s=>s.status!=="scheduled");
+  const li=s=>`<li class="item"><span>${s.slots?.starts_at?esc(fmt(s.slots.starts_at)):""}</span><span class="pill">${esc(s.notes||"")}</span></li>`;
   return `<h3>${a("upcoming")}</h3>${up.length?`<ul class="list">${up.map(li).join("")}</ul>`:emptyNote(a("noUpcoming"))}
   <h3 style="margin-top:28px">${a("history")}</h3><p class="note">${a("visits")}${past.length}</p>${past.length?`<ul class="list">${past.map(li).join("")}</ul>`:emptyNote(a("noHistory"))}`;},
-knowledge:u=>{if(!u.student)return lockHTML(a("studentOnly"),a("knowLock"));
-  if(!db.materials.length)return emptyNote(a("noMaterials"));
-  return `<div class="mats">${db.materials.map(m=>m.granted.includes(u.id)?`<article class="mat"><h4>${esc(m.title)}</h4>${m.image?`<div class="mat-media protect"><img src="${m.image}" alt="" draggable="false"><span class="wm">${esc(u.name)} · Maria Blade</span></div>`:""}<p>${esc(m.text).replace(/\n/g,"<br>")}</p></article>`
-    :`<div class="item locked">${ICON_LOCK}<span>${esc(m.title)}</span><span class="pill">${a("awaitAccess")}</span></div>`).join("")}</div>`;},
-reviews:u=>{const mine=db.reviews.filter(r=>r.userId===u.id).sort((x,y)=>y.date.localeCompare(x.date));
+knowledge:async u=>{if(!u.student)return lockHTML(a("studentOnly"),a("knowLock"));
+  const{data}=await supabase.from("materials").select("*, material_access!inner(student_id)").eq("material_access.student_id",u.id);
+  const mats=data||[];
+  if(!mats.length)return emptyNote(a("noMaterials"));
+  const cards=await Promise.all(mats.map(async m=>{const img=m.kind==="image"&&m.storage_path?await signedMaterialUrl(m.storage_path):"";
+    return `<article class="mat"><h4>${esc(m.title)}</h4>${img?`<div class="mat-media protect"><img src="${img}" alt="" draggable="false"><span class="wm">${esc(u.name)} · Maria Blade</span></div>`:""}<p>${esc(m.description||"").replace(/\n/g,"<br>")}</p></article>`;}));
+  return `<div class="mats">${cards.join("")}</div>`;},
+reviews:async u=>{const{data}=await supabase.from("reviews").select("*").eq("student_id",u.id).order("created_at",{ascending:false});
+  const mine=data||[];
   return `<form id="revForm" novalidate><div class="field"><label class="lbl" for="revText">${a("yourReview")}</label><textarea id="revText" rows="3" maxlength="800"></textarea></div>
   <div class="err" id="revErr" role="alert"></div><button class="glass" type="submit">${a("sendReview")}</button></form>
-  ${mine.length?`<ul class="list" style="margin-top:22px">${mine.map(r=>`<li class="item"><span class="rv">${esc(r.text)}</span><span class="pill ${r.approved?"red":""}">${a(r.approved?"rev_pub":"rev_pending")}</span></li>`).join("")}</ul>`:""}`;},
-messages:u=>{const th=db.messages.filter(m=>m.userId===u.id).sort((x,y)=>x.date.localeCompare(y.date));
-  const thread=th.length?`<div class="thread">${th.map(m=>`<div class="bub ${m.fromAdmin?"her":"mine"}"><span class="mono">${m.fromAdmin?a("maria"):a("you")} · ${esc(fmt(m.date))}</span><p>${esc(m.text)}</p></div>`).join("")}</div>`:"";
+  ${mine.length?`<ul class="list" style="margin-top:22px">${mine.map(r=>`<li class="item"><span class="rv">${esc(r.body)}</span><span class="pill ${r.status==="approved"?"red":""}">${a("rev_"+r.status)}</span></li>`).join("")}</ul>`:""}`;},
+messages:async u=>{const{data}=await supabase.from("messages").select("*").or(`sender_id.eq.${u.id},recipient_id.eq.${u.id}`).order("created_at");
+  const th=data||[];
+  const thread=th.length?`<div class="thread">${th.map(m=>`<div class="bub ${m.sender_id!==u.id?"her":"mine"}"><span class="mono">${m.sender_id!==u.id?a("maria"):a("you")} · ${esc(fmt(m.created_at))}</span><p>${esc(m.body)}</p></div>`).join("")}</div>`:"";
   if(!u.verified)return `<div class="lock">${ICON_LOCK}<span class="note">${a("msgVerifyFirst")}</span><button type="button" class="glass sm" data-a="verify">${a("verifyEmail")}</button></div>${thread}`;
   return `${thread}<form id="msgForm" novalidate><div class="field"><label class="lbl" for="msgText">${a("msgPh")}</label><textarea id="msgText" rows="3" maxlength="1500"></textarea></div>
   <p class="note">${a("msgFrom")}${esc(u.email)}</p><div class="err" id="msgErr" role="alert"></div><button class="glass" type="submit">${a("send")}<span class="arr">→</span></button></form>`;}
 };
 
-/* ----- Maria's panel ----- */
+/* ----- Maria's panel: email+password, then a TOTP step (enroll the first time, challenge after) ----- */
 const ATABS=["students","training","slots","messages","reviews","knowledge"];
-function renderAdm(){
-  if(!admOk){$("admHead").innerHTML=`<div><p class="mono eyebrow">mariablade.com/infinitylove</p><h3>${a("adm")}</h3></div>`;$("admTabs").innerHTML="";
-    $("admPane").innerHTML=`<form id="admLogin" class="adm-login" novalidate>
-      <div class="field"><label class="lbl" for="ad-l">${a("admLogin")}</label><input type="text" id="ad-l" autocomplete="username" maxlength="80"></div>
-      <div class="field"><label class="lbl" for="ad-p">${a("admPass")}</label><input type="password" id="ad-p" autocomplete="current-password" maxlength="128"></div>
+function renderAdmLogin(){
+  $("admHead").innerHTML=`<div><p class="mono eyebrow">mariablade.com/infinitylove</p><h3>${a("adm")}</h3></div>`;$("admTabs").innerHTML="";
+  if(admStep==="enroll"){
+    $("admPane").innerHTML=`<div class="pcard"><h4>${a("mfaSetupTitle")}</h4><p class="note">${a("mfaSetupHint")}</p>
+      ${admTotp?.qr_code?`<div style="background:#fff;padding:12px;border-radius:12px;width:fit-content">${admTotp.qr_code}</div>`:""}
+      ${admTotp?.secret?`<p class="note mono">${a("mfaSecretFallback")} ${esc(admTotp.secret)}</p>`:""}
+      <form id="admMfaForm" novalidate><div class="field"><label class="lbl" for="ad-c2">${a("adm2fa")}</label><input type="text" id="ad-c2" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+      <div class="err" id="adm-err" role="alert"></div><button class="glass" type="submit">${a("mfaSetupTitle")}<span class="arr">→</span></button></form></div>`;
+    return;
+  }
+  if(admStep==="challenge"){
+    $("admPane").innerHTML=`<form id="admChallengeForm" class="adm-login" novalidate>
       <div class="field"><label class="lbl" for="ad-c">${a("adm2fa")}</label><input type="text" id="ad-c" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
-      <button class="glass" type="submit">${a("admEnter")}<span class="arr">→</span></button><p class="note">${a("admNote")}</p></form>`;return;}
-  const n=db.requests.filter(r=>r.status==="new").length;
+      <div class="err" id="adm-err" role="alert"></div><button class="glass" type="submit">${a("admVerify")}<span class="arr">→</span></button></form>`;
+    return;
+  }
+  $("admPane").innerHTML=`<form id="admLogin" class="adm-login" novalidate>
+    <div class="field"><label class="lbl" for="ad-l">${a("admLogin")}</label><input type="email" id="ad-l" autocomplete="username" maxlength="120"></div>
+    <div class="field"><label class="lbl" for="ad-p">${a("admPass")}</label><input type="password" id="ad-p" autocomplete="current-password" maxlength="128"></div>
+    <div class="err" id="adm-err" role="alert"></div>
+    <button class="glass" type="submit">${a("admEnter")}<span class="arr">→</span></button></form>`;
+}
+async function renderAdm(){
+  if(!admOk){renderAdmLogin();return;}
   $("admHead").innerHTML=`<div><p class="mono eyebrow">mariablade.com/infinitylove</p><h3>${a("adm")}</h3></div>`;
-  $("admTabs").innerHTML=ATABS.map(k=>`<button type="button" role="tab" data-a="atab" data-k="${k}" aria-selected="${admTab===k}">${a("a_"+k)}${k==="training"&&n?` <span class="badge">${n}</span>`:""}</button>`).join("");
-  $("admPane").innerHTML=APANE[admTab]();}
-const userOpts=()=>db.users.map(u=>`<option value="${u.id}">${esc(u.name)}${u.student?" ★":""}</option>`).join("");
+  $("admTabs").innerHTML=ATABS.map(k=>`<button type="button" role="tab" data-a="atab" data-k="${k}" aria-selected="${admTab===k}">${a("a_"+k)}</button>`).join("");
+  $("admPane").innerHTML=await APANE[admTab]();}
+const userOpts=students=>students.map(u=>`<option value="${u.id}">${esc(u.full_name||u.id)}${u.is_student?" ★":""}</option>`).join("");
+async function fetchStudents(){const{data}=await supabase.from("profiles").select("*").order("created_at");return data||[];}
 const APANE={
-students:()=>db.users.length?`<ul class="list">${db.users.map(u=>{const v=db.sessions.filter(s=>s.userId===u.id&&!future(s.date)).length;
-  return `<li class="item"><div class="row">${avHTML(u,"sm")}<div><strong>${esc(u.name)}</strong><div class="note">${esc(u.email)}${u.verified?" ✓":""}${u.social?` · ${esc(u.social)}`:""} · ${a("visits")}${v}</div></div></div>
-  <div class="row">${statusPill(u)}<button type="button" class="glass sm" data-a="toggle-student" data-id="${u.id}">${u.student?a("unStudent"):a("makeStudent")}</button></div></li>`;}).join("")}</ul>`:emptyNote(a("noUsers")),
-training:()=>{const req=db.requests.filter(r=>r.status==="new"),up=db.sessions.filter(s=>future(s.date)).sort((x,y)=>x.date.localeCompare(y.date)),past=db.sessions.filter(s=>!future(s.date)).sort((x,y)=>y.date.localeCompare(x.date));
-  const sli=s=>{const u=userById(s.userId);return `<li class="item"><span>${esc(fmt(s.date))} · ${esc(u?u.name:"—")} · ${esc(dirName(s.dir))}</span><button type="button" class="txt-btn" data-a="del-session" data-id="${s.id}">${a("remove")}</button></li>`;};
-  return `<h4>${a("requests")}</h4>${req.length?`<ul class="list">${req.map(r=>{const u=userById(r.userId),s=db.slots.find(x=>x.id===r.slotId);return `<li class="item"><span>${esc(u?u.name:"—")} · ${s?esc(fmt(s.date)):"—"} · ${esc(dirName(r.dir))}${r.note?` · «${esc(r.note)}»`:""}</span>
-    <span class="row"><button type="button" class="glass sm" data-a="req-ok" data-id="${r.id}">${a("confirm")}</button><button type="button" class="txt-btn" data-a="req-no" data-id="${r.id}">${a("decline")}</button></span></li>`;}).join("")}</ul>`:emptyNote(a("noRequests"))}
-  <h4>${a("assign")}</h4>${db.users.length?`<form id="assignForm" class="inline-form" novalidate><div class="field"><label class="lbl" for="as-u">${a("who")}</label><select id="as-u">${userOpts()}</select></div>
+students:async()=>{const list=await fetchStudents();if(!list.length)return emptyNote(a("noUsers"));
+  return `<ul class="list">${list.map(u=>`<li class="item"><div class="row">${avHTML({name:u.full_name})}<div><strong>${esc(u.full_name||"—")}</strong><div class="note">${u.instagram?esc(u.instagram):""}</div></div></div>
+  <div class="row">${statusPill({student:u.is_student})}<button type="button" class="glass sm" data-a="toggle-student" data-id="${u.id}" data-on="${u.is_student?"0":"1"}">${u.is_student?a("unStudent"):a("makeStudent")}</button></div></li>`).join("")}</ul>`;},
+training:async()=>{
+  const[{data:bookings},{data:lessons},students]=await Promise.all([
+    supabase.from("bookings").select("*").eq("status","pending").order("created_at"),
+    supabase.from("lessons").select("*, slots(starts_at)").order("created_at"),
+    fetchStudents()
+  ]);
+  const byId=Object.fromEntries(students.map(s=>[s.id,s]));
+  const req=bookings||[],mine=lessons||[],up=mine.filter(s=>s.status==="scheduled"),past=mine.filter(s=>s.status!=="scheduled");
+  const sli=s=>`<li class="item"><span>${s.slots?.starts_at?esc(fmt(s.slots.starts_at))+" · ":""}${esc(byId[s.student_id]?.full_name||"—")}${s.notes?` · ${esc(s.notes)}`:""}</span><button type="button" class="txt-btn" data-a="del-session" data-id="${s.id}">${a("remove")}</button></li>`;
+  return `<h4>${a("requests")}</h4>${req.length?`<ul class="list">${req.map(r=>`<li class="item"><span>${esc(byId[r.student_id]?.full_name||r.contact_name||"—")} · ${esc(dirName(r.practice_type))}${r.message?` · «${esc(r.message)}»`:""}</span>
+    <span class="row"><button type="button" class="glass sm" data-a="req-ok" data-id="${r.id}" data-student="${r.student_id||""}" data-slot="${r.slot_id||""}">${a("confirm")}</button><button type="button" class="txt-btn" data-a="req-no" data-id="${r.id}">${a("decline")}</button></span></li>`).join("")}</ul>`:emptyNote(a("noRequests"))}
+  <h4>${a("assign")}</h4>${students.length?`<form id="assignForm" class="inline-form" novalidate><div class="field"><label class="lbl" for="as-u">${a("who")}</label><select id="as-u">${userOpts(students)}</select></div>
     <div class="field"><label class="lbl" for="as-d">${a("when")}</label><input type="datetime-local" id="as-d"></div><div class="field"><label class="lbl" for="as-k">${a("direction")}</label><select id="as-k">${dirOptions()}</select></div>
     <button class="glass sm" type="submit">${a("add")}</button></form>`:emptyNote(a("noUsers"))}
   <h4>${a("upcoming")}</h4>${up.length?`<ul class="list">${up.map(sli).join("")}</ul>`:emptyNote(a("noSessions"))}
   <h4>${a("history")}</h4>${past.length?`<ul class="list">${past.map(sli).join("")}</ul>`:emptyNote(a("noSessions"))}`;},
-slots:()=>{const fr=db.slots.filter(s=>future(s.date)).sort((x,y)=>x.date.localeCompare(y.date));
+slots:async()=>{const{data}=await supabase.from("slots").select("*").eq("is_open",true).gt("starts_at",new Date().toISOString()).order("starts_at");
+  const fr=data||[];
   return `<form id="slotForm" class="inline-form" novalidate><div class="field"><label class="lbl" for="sl-d">${a("when")}</label><input type="datetime-local" id="sl-d"></div><button class="glass sm" type="submit">${a("addSlot")}</button></form>
-  ${fr.length?`<ul class="list" style="margin-top:18px">${fr.map(s=>`<li class="item"><span>${esc(fmt(s.date))}</span><button type="button" class="txt-btn" data-a="del-slot" data-id="${s.id}">${a("remove")}</button></li>`).join("")}</ul>`:emptyNote(a("noFree"))}`;},
-messages:()=>{const ids=[...new Set(db.messages.map(m=>m.userId))];if(!ids.length)return emptyNote(a("noMessages"));
-  return ids.map(id=>{const u=userById(id),th=db.messages.filter(m=>m.userId===id).sort((x,y)=>x.date.localeCompare(y.date));
-    return `<section class="adm-thread"><div class="row">${avHTML(u,"sm")}<strong>${esc(u?u.name:"—")}</strong><span class="note">${esc(u?u.email:"")}</span></div>
-    <div class="thread">${th.map(m=>`<div class="bub ${m.fromAdmin?"mine":"her"}"><span class="mono">${m.fromAdmin?a("maria"):esc(u?u.name:"")} · ${esc(fmt(m.date))}</span><p>${esc(m.text)}</p></div>`).join("")}</div>
+  ${fr.length?`<ul class="list" style="margin-top:18px">${fr.map(s=>`<li class="item"><span>${esc(fmt(s.starts_at))}</span><button type="button" class="txt-btn" data-a="del-slot" data-id="${s.id}">${a("remove")}</button></li>`).join("")}</ul>`:emptyNote(a("noFree"))}`;},
+messages:async()=>{
+  const[{data:msgs},students]=await Promise.all([supabase.from("messages").select("*").order("created_at"),fetchStudents()]);
+  const all=msgs||[];if(!all.length)return emptyNote(a("noMessages"));
+  const byId=Object.fromEntries(students.map(s=>[s.id,s]));
+  const adminId=profileRow.id;
+  const ids=[...new Set(all.map(m=>m.sender_id===adminId?m.recipient_id:m.sender_id).filter(Boolean))];
+  return ids.map(id=>{const u=byId[id],th=all.filter(m=>m.sender_id===id||m.recipient_id===id).sort((x,y)=>new Date(x.created_at)-new Date(y.created_at));
+    return `<section class="adm-thread"><div class="row">${avHTML({name:u?.full_name})}<strong>${esc(u?.full_name||"—")}</strong></div>
+    <div class="thread">${th.map(m=>`<div class="bub ${m.sender_id===adminId?"mine":"her"}"><span class="mono">${m.sender_id===adminId?a("maria"):esc(u?.full_name||"")} · ${esc(fmt(m.created_at))}</span><p>${esc(m.body)}</p></div>`).join("")}</div>
     <form class="replyForm inline-form" data-id="${id}" novalidate><div class="field" style="flex:1"><label class="lbl" for="rp-${id}">${a("reply")}</label><input type="text" id="rp-${id}" maxlength="1500"></div><button class="glass sm" type="submit">${a("send")}</button></form></section>`;}).join("");},
-reviews:()=>db.reviews.length?`<ul class="list">${db.reviews.map(r=>{const u=userById(r.userId);return `<li class="item"><span class="rv"><strong>${esc(u?u.name:"—")}</strong> — ${esc(r.text)}</span>
-  <span class="row"><button type="button" class="glass sm" data-a="rev-toggle" data-id="${r.id}">${r.approved?a("unpublish"):a("approve")}</button><button type="button" class="txt-btn" data-a="rev-del" data-id="${r.id}">${a("del")}</button></span></li>`;}).join("")}</ul>`:emptyNote(a("noReviews")),
-knowledge:()=>{const st=db.users.filter(u=>u.student);
+reviews:async()=>{const[{data:revs},students]=await Promise.all([supabase.from("reviews").select("*").order("created_at",{ascending:false}),fetchStudents()]);
+  const list=revs||[];if(!list.length)return emptyNote(a("noReviews"));
+  const byId=Object.fromEntries(students.map(s=>[s.id,s]));
+  return `<ul class="list">${list.map(r=>`<li class="item"><span class="rv"><strong>${esc(r.student_id?byId[r.student_id]?.full_name||"—":r.author_name)}</strong> — ${esc(r.body)} <span class="pill ${r.status==="approved"?"red":""}">${a("rev_"+r.status)}</span></span>
+  <span class="row"><button type="button" class="glass sm" data-a="rev-toggle" data-id="${r.id}" data-to="${r.status==="approved"?"rejected":"approved"}">${r.status==="approved"?a("unpublish"):a("approve")}</button><button type="button" class="txt-btn" data-a="rev-del" data-id="${r.id}">${a("del")}</button></span></li>`).join("")}</ul>`;},
+knowledge:async()=>{
+  const[{data:mats},{data:grants},students]=await Promise.all([
+    supabase.from("materials").select("*").order("created_at",{ascending:false}),
+    supabase.from("material_access").select("*"),
+    fetchStudents()
+  ]);
+  const list=mats||[],grantRows=grants||[];
   return `<form id="matForm" novalidate><div class="field"><label class="lbl" for="mt-t">${a("matTitle")}</label><input type="text" id="mt-t" maxlength="120"></div>
   <div class="field"><label class="lbl" for="mt-x">${a("matText")}</label><textarea id="mt-x" rows="3" maxlength="4000"></textarea></div>
   <div class="field"><label class="lbl" for="mt-i">${a("matImage")}</label><input type="file" id="mt-i" accept="image/*"></div>
   <div class="err" id="mtErr" role="alert"></div><button class="glass sm" type="submit">${a("addMat")}</button></form>
-  <ul class="list" style="margin-top:22px">${db.materials.map(m=>`<li class="item col"><div class="row" style="justify-content:space-between;width:100%"><strong>${esc(m.title)}</strong><button type="button" class="txt-btn" data-a="mat-del" data-id="${m.id}">${a("del")}</button></div>
-    <div class="row"><span class="mono note">${a("access")}:</span>${st.length?st.map(u=>`<label class="chk"><input type="checkbox" data-a="grant" data-m="${m.id}" data-u="${u.id}" ${m.granted.includes(u.id)?"checked":""}><span>${esc(u.name)}</span></label>`).join(""):`<span class="note">${a("noStudents")}</span>`}</div></li>`).join("")}</ul>`;}
+  <ul class="list" style="margin-top:22px">${list.map(m=>`<li class="item col"><div class="row" style="justify-content:space-between;width:100%"><strong>${esc(m.title)}</strong><button type="button" class="txt-btn" data-a="mat-del" data-id="${m.id}">${a("del")}</button></div>
+    <div class="row"><span class="mono note">${a("access")}:</span>${students.length?students.map(u=>`<label class="chk"><input type="checkbox" data-a="grant" data-m="${m.id}" data-u="${u.id}" ${grantRows.some(g=>g.material_id===m.id&&g.student_id===u.id)?"checked":""}><span>${esc(u.full_name||"—")}</span></label>`).join(""):`<span class="note">${a("noStudents")}</span>`}</div></li>`).join("")}</ul>`;}
 };
 
 /* ----- public reviews (only those Maria published) ----- */
-function renderPubRevs(){const box=$("pubRevs"),list=db.reviews.filter(r=>r.approved);box.hidden=!list.length;
-  box.innerHTML=list.length?`<span class="mono">${a("revsTitle")}</span>${list.slice(-4).reverse().map(r=>{const u=userById(r.userId);return `<figure class="rev">${avHTML(u,"sm")}<figcaption><p>${esc(r.text)}</p><span class="mono">${esc(u?u.name:"")}</span></figcaption></figure>`;}).join("")}`:"";}
+async function renderPubRevs(){const box=$("pubRevs");
+  const{data}=await supabase.from("reviews").select("*").eq("status","approved").order("created_at",{ascending:false}).limit(4);
+  const list=data||[];box.hidden=!list.length;
+  box.innerHTML=list.length?`<span class="mono">${a("revsTitle")}</span>${list.map(r=>`<figure class="rev">${avHTML({name:r.author_name})}<figcaption><p>${esc(r.body)}</p><span class="mono">${esc(r.author_name)}</span></figcaption></figure>`).join("")}`:"";}
 
 function acctRefresh(){renderNav();renderPubRevs();if(acct.open)renderAcct();if(prof.open)renderProf();if(adm.open)renderAdm();}
-const commit=()=>{persist();acctRefresh();};
 
 /* ----- clicks ----- */
-document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");
   if(e.target.matches("dialog.dlg"))softClose(e.target);
   if(!b)return;const act=b.dataset.a,id=b.dataset.id,u=me();
   switch(act){
     case"close":softClose(b.closest("dialog"));break;
     case"tab-in":authTab="in";renderAcct();break;
     case"tab-up":authTab="up";renderAcct();break;
-    case"logout":db.session=null;commit();softClose(acct);break;
+    case"logout":await supabase.auth.signOut();admOk=false;softClose(acct);break;
     case"open-prof":acct.close();profTab="profile";renderProf();dlgOpen(prof);break;
     case"ptab":profTab=b.dataset.k;renderProf();break;
-    /* TODO(supabase): replace with the real email-confirmation flow (Supabase sends the link). */
-    case"verify":if(u){u.verified=true;commit();toast(a("verifySent"));}break;
+    case"verify":if(u){await supabase.auth.resend({type:"signup",email:u.email});toast(a("verifySent"));}break;
     case"atab":admTab=b.dataset.k;renderAdm();break;
-    /* TODO(supabase): update the `profiles.student` flag via an admin-only RLS policy / RPC. */
-    case"toggle-student":{const x=userById(id);if(x){x.student=!x.student;commit();}break;}
-    /* TODO(supabase): update `bookings.status` and insert into `lessons` server-side (RPC), not client-side. */
-    case"req-ok":{const r=db.requests.find(x=>x.id===id),s=r&&db.slots.find(x=>x.id===r.slotId);if(r&&s){r.status="confirmed";db.sessions.push({id:nid(),userId:r.userId,date:s.date,dir:r.dir});commit();}break;}
-    case"req-no":{const r=db.requests.find(x=>x.id===id);if(r){r.status="declined";commit();}break;}
-    /* TODO(supabase): delete from `lessons`/`slots` via RLS-guarded admin policy. */
-    case"del-session":db.sessions=db.sessions.filter(s=>s.id!==id);commit();break;
-    case"del-slot":db.slots=db.slots.filter(s=>s.id!==id);commit();break;
-    /* TODO(supabase): toggle `reviews.approved` (moderation) — admin only, via RLS/RPC. */
-    case"rev-toggle":{const r=db.reviews.find(x=>x.id===id);if(r){r.approved=!r.approved;commit();}break;}
-    case"rev-del":db.reviews=db.reviews.filter(r=>r.id!==id);commit();break;
-    case"mat-del":db.materials=db.materials.filter(m=>m.id!==id);commit();break;
+    case"toggle-student":await supabase.from("profiles").update({is_student:b.dataset.on==="1"}).eq("id",id);renderAdm();break;
+    case"req-ok":{const slotId=b.dataset.slot||null,studentId=b.dataset.student||null;
+      await supabase.from("bookings").update({status:"confirmed"}).eq("id",id);
+      await supabase.from("lessons").insert({student_id:studentId,slot_id:slotId,booking_id:id,status:"scheduled"});
+      if(slotId)await supabase.from("slots").update({is_open:false}).eq("id",slotId);
+      renderAdm();break;}
+    case"req-no":await supabase.from("bookings").update({status:"declined"}).eq("id",id);renderAdm();break;
+    case"del-session":await supabase.from("lessons").delete().eq("id",id);renderAdm();break;
+    case"del-slot":await supabase.from("slots").delete().eq("id",id);renderAdm();break;
+    case"rev-toggle":await supabase.from("reviews").update({status:b.dataset.to,moderated_at:new Date().toISOString(),moderated_by:profileRow?.id}).eq("id",id);renderAdm();renderPubRevs();break;
+    case"rev-del":await supabase.from("reviews").delete().eq("id",id);renderAdm();renderPubRevs();break;
+    case"mat-del":await supabase.from("materials").delete().eq("id",id);renderAdm();break;
   }});
 document.addEventListener("change",async e=>{const t=e.target;
-  if(t.id==="avFile"&&t.files[0]){const u=me();if(!u)return;try{u.avatar=await readImg(t.files[0],320);commit();toast(a("saved"));}catch(err){}}
-  /* TODO(supabase): persist material access grants in a `material_access` join table, admin-only write. */
-  if(t.dataset&&t.dataset.a==="grant"){const m=db.materials.find(x=>x.id===t.dataset.m);if(m){m.granted=t.checked?[...new Set([...m.granted,t.dataset.u])]:m.granted.filter(x=>x!==t.dataset.u);persist();}}});
+  if(t.id==="avFile"&&t.files[0]){const r=await uploadAvatar(t.files[0]);if(r.ok){renderNav();if(prof.open)renderProf();toast(a("saved"));}}
+  if(t.dataset&&t.dataset.a==="grant"){
+    if(t.checked)await supabase.from("material_access").insert({material_id:t.dataset.m,student_id:t.dataset.u,granted_by:profileRow?.id});
+    else await supabase.from("material_access").delete().eq("material_id",t.dataset.m).eq("student_id",t.dataset.u);
+  }});
 
 /* ----- forms ----- */
 const val=id=>($(id)?.value||"").trim();
 const setE=(id,k)=>{const el=$(id);if(el)el.textContent=k?a(k):"";return !k;};
 document.addEventListener("submit",async e=>{const f=e.target;if(!f.closest("dialog.dlg"))return;e.preventDefault();const u=me();
-  /* TODO(supabase): replace with supabase.auth.signUp / signInWithPassword. Email confirmation becomes
-     a real emailed link (Supabase Auth), not an in-browser flag. */
+
   if(f.id==="authForm"){const email=val("au-email").toLowerCase(),pass=$("au-pass").value;
     if(authTab==="up"){const name=val("au-name");
       if(!name)return setE("au-err","eName");if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return setE("au-err","eEmail");if(pass.length<8)return setE("au-err","ePass");
-      if(db.users.some(x=>x.email===email))return setE("au-err","eTaken");
-      const nu={id:nid(),name,email,pw:await pwHash(email,pass),avatar:"",social:"",verified:false,student:false,created:new Date().toISOString()};
-      db.users.push(nu);db.session=nu.id;commit();}
-    else{const x=db.users.find(y=>y.email===email);if(!x||x.pw!==await pwHash(email,pass))return setE("au-err","eWrong");db.session=x.id;commit();}
-    return;}
-  /* TODO(supabase): update the `profiles` row for the signed-in user (RLS: a user may only update their own row). */
-  if(f.id==="profForm"&&u){const name=val("pf-name");if(name)u.name=name;u.social=val("pf-social");commit();toast(a("saved"));return;}
-  /* TODO(supabase): insert into `bookings` (status "new") referencing the chosen `slots` row. */
+      const{error}=await supabase.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
+      if(error){if(error.message.toLowerCase().includes("already"))return setE("au-err","eTaken");$("au-err").textContent=error.message;return;}
+      signupPending=true;renderAcct();return;}
+    else{const{error}=await supabase.auth.signInWithPassword({email,password:pass});if(error)return setE("au-err","eWrong");
+      softClose(acct);return;}
+  }
+  if(f.id==="profForm"&&u){const name=val("pf-name");await supabase.from("profiles").update({full_name:name||u.name,instagram:val("pf-social")}).eq("id",u.id);await loadProfile();renderProf();toast(a("saved"));return;}
   if(f.id==="qbForm"&&u){const s=f.querySelector("input[name=slot]:checked");if(!s)return setE("qbErr","ePickSlot");
-    db.requests.push({id:nid(),userId:u.id,slotId:s.value,dir:$("qbDir").value,note:val("qbNote"),status:"new",created:new Date().toISOString()});commit();toast(a("booked"));return;}
-  /* TODO(supabase): insert into `reviews` (approved=false) — moderation queue lives in Postgres, not localStorage. */
-  if(f.id==="revForm"&&u){const t=val("revText");if(t.length<3)return setE("revErr","eEmpty");db.reviews.push({id:nid(),userId:u.id,text:t,date:new Date().toISOString(),approved:false});commit();toast(a("reviewSent"));return;}
-  /* TODO(supabase): insert into `messages` (RLS: a user may insert/read only their own thread with admin). */
-  if(f.id==="msgForm"&&u&&u.verified){const t=val("msgText");if(t.length<2)return setE("msgErr","eEmpty");db.messages.push({id:nid(),userId:u.id,text:t,date:new Date().toISOString(),fromAdmin:false});commit();toast(a("msgSent"));return;}
-  /* TODO(supabase): replace entirely with supabase.auth.signInWithPassword for the admin account + TOTP
-     MFA challenge (aal2). This demo form currently accepts any input. */
-  if(f.id==="admLogin"){admOk=true;renderAdm();return;}
+    await supabase.from("bookings").insert({student_id:u.id,slot_id:s.value,practice_type:$("qbDir").value,message:val("qbNote")||null,contact_name:u.name,contact_email:u.email});
+    renderProf();toast(a("booked"));return;}
+  if(f.id==="revForm"&&u){const t=val("revText");if(t.length<3)return setE("revErr","eEmpty");
+    await supabase.from("reviews").insert({student_id:u.id,author_name:u.name,body:t});renderProf();toast(a("reviewSent"));return;}
+  if(f.id==="msgForm"&&u&&u.verified){const t=val("msgText");if(t.length<2)return setE("msgErr","eEmpty");
+    await supabase.from("messages").insert({sender_id:u.id,recipient_id:null,body:t});renderProf();toast(a("msgSent"));return;}
+
+  if(f.id==="admLogin"){const email=val("ad-l"),pass=$("ad-p").value;
+    const{data,error}=await supabase.auth.signInWithPassword({email,password:pass});
+    if(error)return setE("adm-err","mfaBadLogin");
+    const{data:prof2}=await supabase.from("profiles").select("*").eq("id",data.user.id).single();
+    if(!prof2||prof2.role!=="admin"){await supabase.auth.signOut();return setE("adm-err","mfaNotAdmin");}
+    profileRow=prof2;session=data.session;
+    const{data:factors}=await supabase.auth.mfa.listFactors();
+    const verified=(factors?.totp||[]).find(f2=>f2.status==="verified");
+    if(verified){admFactorId=verified.id;const{data:ch}=await supabase.auth.mfa.challenge({factorId:verified.id});admChallengeId=ch?.id;admStep="challenge";}
+    else{const{data:en}=await supabase.auth.mfa.enroll({factorType:"totp"});admFactorId=en?.id;admTotp=en?.totp;admStep="enroll";}
+    renderAdm();return;}
+  if(f.id==="admChallengeForm"){const code=val("ad-c");
+    const{error}=await supabase.auth.mfa.verify({factorId:admFactorId,challengeId:admChallengeId,code});
+    if(error)return setE("adm-err","mfaWrong");
+    admOk=true;admStep="creds";renderAdm();return;}
+  if(f.id==="admMfaForm"){const code=val("ad-c2");
+    const{error}=await supabase.auth.mfa.challengeAndVerify({factorId:admFactorId,code});
+    if(error)return setE("adm-err","mfaWrong");
+    admOk=true;admStep="creds";renderAdm();return;}
   if(!admOk)return;
-  /* TODO(supabase): insert into `lessons` (admin-only RLS policy / RPC). */
-  if(f.id==="assignForm"){const d=val("as-d");if(!d)return toast(a("eFill"));db.sessions.push({id:nid(),userId:$("as-u").value,date:new Date(d).toISOString(),dir:$("as-k").value});commit();toast(a("done"));return;}
-  /* TODO(supabase): insert into `slots` (admin-only RLS policy / RPC). */
-  if(f.id==="slotForm"){const d=val("sl-d");if(!d)return toast(a("eFill"));db.slots.push({id:nid(),date:new Date(d).toISOString()});commit();return;}
-  /* TODO(supabase): insert into `messages` with fromAdmin=true (admin-only RLS policy). */
-  if(f.classList.contains("replyForm")){const inp=f.querySelector("input"),t=inp.value.trim();if(!t)return;db.messages.push({id:nid(),userId:f.dataset.id,text:t,date:new Date().toISOString(),fromAdmin:true});commit();return;}
-  /* TODO(supabase): upload the image to Storage, insert into `materials` (admin-only RLS policy). */
+  if(f.id==="assignForm"){const d=val("as-d");if(!d)return toast(a("eFill"));
+    await supabase.from("lessons").insert({student_id:$("as-u").value,status:"scheduled",notes:dirName($("as-k").value)+" · "+new Date(d).toLocaleString()});renderAdm();toast(a("done"));return;}
+  if(f.id==="slotForm"){const d=val("sl-d");if(!d)return toast(a("eFill"));
+    await supabase.from("slots").insert({starts_at:new Date(d).toISOString(),ends_at:new Date(d).toISOString()});renderAdm();return;}
+  if(f.classList.contains("replyForm")){const inp=f.querySelector("input"),t=inp.value.trim();if(!t)return;
+    await supabase.from("messages").insert({sender_id:profileRow.id,recipient_id:f.dataset.id,body:t});renderAdm();return;}
   if(f.id==="matForm"){const t=val("mt-t"),x=val("mt-x"),file=$("mt-i").files[0];if(!t||(!x&&!file))return setE("mtErr","eFill");
-    let img="";if(file){try{img=await readImg(file,1200);}catch(err){}}db.materials.push({id:nid(),title:t,text:x,image:img,granted:[]});commit();return;}
+    let storagePath="",kind="article";if(file){const up=await uploadMaterialImage(file);if(up.ok){storagePath=up.path;kind="image";}}
+    await supabase.from("materials").insert({title:t,description:x,storage_path:storagePath,kind,created_by:profileRow.id});renderAdm();return;}
 });
 
 /* ----- Maria's entrance: mariablade.com/infinitylove ----- */
 function admRoute(){if(location.pathname.replace(/\/$/,"").endsWith("/infinitylove")||location.hash==="#infinitylove"){renderAdm();dlgOpen(adm);}}
 addEventListener("hashchange",admRoute);
-adm.addEventListener("close",()=>{admOk=false;if(location.hash==="#infinitylove"){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}});
+adm.addEventListener("close",()=>{admOk=false;admStep="creds";if(location.hash==="#infinitylove"){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}});
 
 /* ----- media: no right-click save, no dragging, no iOS long-press save; materials carry a name watermark ----- */
 document.addEventListener("contextmenu",e=>{if(e.target.closest("img,video,.frame,.polaroid,.portrait,.thumb,.band,.lb,.protect"))e.preventDefault();});
 document.addEventListener("dragstart",e=>{if(e.target.closest("img,video"))e.preventDefault();});
 
-renderNav();renderPubRevs();
+renderNav();initAuth();
 
 apply(lang);glSize();setStops();tone();bgUpdate();admRoute();
 
@@ -640,5 +742,4 @@ apply(lang);glSize();setStops();tone();bgUpdate();admRoute();
   const fontsP=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
   const imgP=new Promise(r=>{if(real.complete)r();else{real.addEventListener("load",r);real.addEventListener("error",r);}});
   Promise.race([Promise.all([minT,fontsP,imgP]),new Promise(r=>setTimeout(r,4500))]).then(()=>requestAnimationFrame(done));
-})();
 })();
