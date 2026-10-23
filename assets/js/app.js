@@ -335,7 +335,7 @@ function apply(l){lang=l;const d=T[l];
 
 
 /* ---------- account: real Supabase Auth + Postgres (RLS) behind the same UI the prototype sketched.
-   Maria's panel lives at #infinitylove and requires an admin profile + a verified TOTP (aal2) session. ---------- */
+   Maria's panel lives at #infinitylove and requires an admin profile. ---------- */
 const A={
 uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_profile:"Ваші дані та зв'язок з Марією",sub_book:"Вільні дати та ваші заявки",sub_study:"Заняття та історія відвідувань",sub_knowledge:"Матеріали від Марії",sub_reviews:"Кілька слів для Марії",sub_messages:"Пряма переписка з Марією",pData:"Особисті дані",pStatus:"Статус",mailOk:"Пошта закріплена за профілем: Марія відповідатиме на неї.",mailWhy:"Підтвердіть пошту, щоб писати Марії з профілю.",joinNote:"Після реєстрації Марія побачить ваш профіль і відкриє статус учениці.",signIn:"Вхід",signUp:"Реєстрація",createAcc:"Створити акаунт",name:"Ім'я",password:"Пароль",
   signupCheckEmail:"Перевірте пошту: ми надіслали лист із посиланням для підтвердження акаунту.",
@@ -356,8 +356,8 @@ uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_prof
   msgVerifyFirst:"Підтвердіть пошту в профілі, і тоді зможете писати Марії без введення email: він закріпиться за вами.",
   msgPh:"Повідомлення для Марії",send:"Надіслати",msgFrom:"Відповідь прийде на ",you:"Ви",maria:"Марія",msgSent:"Повідомлення надіслано",
   revsTitle:"Відгуки учениць",
-  adm:"Кабінет Марії",admLogin:"Email",admPass:"Пароль",adm2fa:"Код з застосунку-автентифікатора",admEnter:"Увійти",admVerify:"Підтвердити",
-  mfaSetupTitle:"Налаштуйте двофакторний вхід",mfaSetupHint:"Відскануйте QR-код застосунком-автентифікатором (Google Authenticator, Authy тощо), потім введіть 6-значний код.",mfaSecretFallback:"Якщо не можете сканувати QR — введіть цей код вручну:",mfaWrong:"Невірний код. Спробуйте ще раз.",mfaBadLogin:"Невірний email або пароль.",mfaNotAdmin:"Цей акаунт не має прав адміністраторки.",
+  adm:"Кабінет Марії",admLogin:"Email",admPass:"Пароль",admEnter:"Увійти",
+  mfaBadLogin:"Невірний email або пароль.",mfaNotAdmin:"Цей акаунт не має прав адміністраторки.",
   a_students:"Учениці",a_training:"Тренування",a_slots:"Вільні дати",a_messages:"Повідомлення",a_reviews:"Відгуки",a_knowledge:"Знання",
   noUsers:"Поки ніхто не зареєструвався.",makeStudent:"Зробити ученицею",unStudent:"Зняти статус",
   requests:"Нові заявки",noRequests:"Нових заявок немає.",confirm:"Підтвердити",decline:"Відхилити",assign:"Призначити тренування",who:"Учениця",when:"Дата й час",add:"Додати",remove:"Прибрати",
@@ -384,8 +384,8 @@ en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and 
   msgVerifyFirst:"Confirm your email in the profile, then you can message Maria without typing it: it stays attached to you.",
   msgPh:"Message to Maria",send:"Send",msgFrom:"Replies go to ",you:"You",maria:"Maria",msgSent:"Message sent",
   revsTitle:"Students' reviews",
-  adm:"Maria's panel",admLogin:"Email",admPass:"Password",adm2fa:"Code from your authenticator app",admEnter:"Sign in",admVerify:"Confirm",
-  mfaSetupTitle:"Set up two-factor sign-in",mfaSetupHint:"Scan this QR code with an authenticator app (Google Authenticator, Authy, etc.), then enter the 6-digit code.",mfaSecretFallback:"Can't scan it? Enter this code by hand:",mfaWrong:"Wrong code. Try again.",mfaBadLogin:"Wrong email or password.",mfaNotAdmin:"This account does not have admin rights.",
+  adm:"Maria's panel",admLogin:"Email",admPass:"Password",admEnter:"Sign in",
+  mfaBadLogin:"Wrong email or password.",mfaNotAdmin:"This account does not have admin rights.",
   a_students:"Students",a_training:"Training",a_slots:"Free dates",a_messages:"Messages",a_reviews:"Reviews",a_knowledge:"Knowledge",
   noUsers:"Nobody has signed up yet.",makeStudent:"Make student",unStudent:"Remove status",
   requests:"New requests",noRequests:"No new requests.",confirm:"Confirm",decline:"Decline",assign:"Assign a session",who:"Student",when:"Date and time",add:"Add",remove:"Remove",
@@ -474,7 +474,7 @@ document.querySelectorAll("dialog.dlg").forEach(d=>{d.addEventListener("cancel",
 
 /* ----- nav avatar and the small centred card ----- */
 const acct=$("acct"),prof=$("prof"),adm=$("adm"),avBtn=$("avatarBtn");
-let authTab="in",profTab="profile",admTab="students",admOk=false,admStep="creds",admFactorId=null,admChallengeId=null,admTotp=null,signupPending=false;
+let authTab="in",profTab="profile",admTab="students",admOk=false,signupPending=false;
 function renderNav(){const u=me();avBtn.innerHTML=avHTML(u);avBtn.classList.toggle("on",!!u);avBtn.setAttribute("aria-label",u?`${a("acct")}: ${u.name}`:a("acct"));}
 function renderAcct(){const u=me(),v=$("acctBody");
   if(signupPending){v.innerHTML=`<p class="mono eyebrow">${a("acctEyebrow")}</p><h3>${a("signUp")}</h3><p class="note">${a("signupCheckEmail")}</p>`;return;}
@@ -564,24 +564,10 @@ messages:async u=>{const{data}=await supabase.from("messages").select("*").or(`s
   <p class="note">${a("msgFrom")}${esc(u.email)}</p><div class="err" id="msgErr" role="alert"></div><button class="glass" type="submit">${a("send")}<span class="arr">→</span></button></form>`;}
 };
 
-/* ----- Maria's panel: email+password, then a TOTP step (enroll the first time, challenge after) ----- */
+/* ----- Maria's panel: email+password ----- */
 const ATABS=["students","training","slots","messages","reviews","knowledge"];
 function renderAdmLogin(){
   $("admHead").innerHTML=`<div><p class="mono eyebrow">mariablade.com/infinitylove</p><h3>${a("adm")}</h3></div>`;$("admTabs").innerHTML="";
-  if(admStep==="enroll"){
-    $("admPane").innerHTML=`<div class="pcard"><h4>${a("mfaSetupTitle")}</h4><p class="note">${a("mfaSetupHint")}</p>
-      ${admTotp?.qr_code?`<div style="background:#fff;padding:12px;border-radius:12px;width:fit-content">${admTotp.qr_code}</div>`:""}
-      ${admTotp?.secret?`<p class="note mono">${a("mfaSecretFallback")} ${esc(admTotp.secret)}</p>`:""}
-      <form id="admMfaForm" novalidate><div class="field"><label class="lbl" for="ad-c2">${a("adm2fa")}</label><input type="text" id="ad-c2" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
-      <div class="err" id="adm-err" role="alert"></div><button class="glass" type="submit">${a("mfaSetupTitle")}<span class="arr">→</span></button></form></div>`;
-    return;
-  }
-  if(admStep==="challenge"){
-    $("admPane").innerHTML=`<form id="admChallengeForm" class="adm-login" novalidate>
-      <div class="field"><label class="lbl" for="ad-c">${a("adm2fa")}</label><input type="text" id="ad-c" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
-      <div class="err" id="adm-err" role="alert"></div><button class="glass" type="submit">${a("admVerify")}<span class="arr">→</span></button></form>`;
-    return;
-  }
   $("admPane").innerHTML=`<form id="admLogin" class="adm-login" novalidate>
     <div class="field"><label class="lbl" for="ad-l">${a("admLogin")}</label><input type="email" id="ad-l" autocomplete="username" maxlength="120"></div>
     <div class="field"><label class="lbl" for="ad-p">${a("admPass")}</label><input type="password" id="ad-p" autocomplete="current-password" maxlength="128"></div>
@@ -718,20 +704,7 @@ document.addEventListener("submit",async e=>{const f=e.target;if(!f.closest("dia
     if(error)return setE("adm-err","mfaBadLogin");
     const{data:prof2}=await supabase.from("profiles").select("*").eq("id",data.user.id).single();
     if(!prof2||prof2.role!=="admin"){await supabase.auth.signOut();return setE("adm-err","mfaNotAdmin");}
-    profileRow=prof2;session=data.session;
-    const{data:factors}=await supabase.auth.mfa.listFactors();
-    const verified=(factors?.totp||[]).find(f2=>f2.status==="verified");
-    if(verified){admFactorId=verified.id;const{data:ch}=await supabase.auth.mfa.challenge({factorId:verified.id});admChallengeId=ch?.id;admStep="challenge";}
-    else{const{data:en}=await supabase.auth.mfa.enroll({factorType:"totp"});admFactorId=en?.id;admTotp=en?.totp;admStep="enroll";}
-    renderAdm();return;}
-  if(f.id==="admChallengeForm"){const code=val("ad-c");
-    const{error}=await supabase.auth.mfa.verify({factorId:admFactorId,challengeId:admChallengeId,code});
-    if(error)return setE("adm-err","mfaWrong");
-    admOk=true;admStep="creds";renderAdm();return;}
-  if(f.id==="admMfaForm"){const code=val("ad-c2");
-    const{error}=await supabase.auth.mfa.challengeAndVerify({factorId:admFactorId,code});
-    if(error)return setE("adm-err","mfaWrong");
-    admOk=true;admStep="creds";renderAdm();return;}
+    profileRow=prof2;session=data.session;admOk=true;renderAdm();return;}
   if(!admOk)return;
   if(f.id==="assignForm"){const d=val("as-d");if(!d)return toast(a("eFill"));
     await supabase.from("lessons").insert({student_id:$("as-u").value,status:"scheduled",notes:dirName($("as-k").value)+" · "+new Date(d).toLocaleString()});renderAdm();toast(a("done"));return;}
@@ -747,7 +720,7 @@ document.addEventListener("submit",async e=>{const f=e.target;if(!f.closest("dia
 /* ----- Maria's entrance: mariablade.com/infinitylove ----- */
 function admRoute(){if(location.pathname.replace(/\/$/,"").endsWith("/infinitylove")||location.hash==="#infinitylove"){renderAdm();dlgOpen(adm);}}
 addEventListener("hashchange",admRoute);
-adm.addEventListener("close",()=>{admOk=false;admStep="creds";if(location.hash==="#infinitylove"){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}});
+adm.addEventListener("close",()=>{admOk=false;if(location.hash==="#infinitylove"){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}});
 
 /* ----- media: no right-click save, no dragging, no iOS long-press save; materials carry a name watermark ----- */
 document.addEventListener("contextmenu",e=>{if(e.target.closest("img,video,.frame,.polaroid,.portrait,.thumb,.band,.lb,.protect"))e.preventDefault();});
