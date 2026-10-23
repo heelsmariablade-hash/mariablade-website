@@ -426,18 +426,40 @@ async function initAuth(){
   supabase.auth.onAuthStateChange(async(_event,s2)=>{session=s2;await loadProfile();acctRefresh();});
 }
 
-/* ---------- image upload: a private Storage path, resolved to a short-lived signed URL at render time ---------- */
+/* ---------- image upload: resize/compress client-side (Canvas), then a private Storage path, resolved to a short-lived signed URL at render time ---------- */
 function extOf(file){const m=/\.([a-z0-9]+)$/i.exec(file.name||"");return(m?m[1]:"jpg").toLowerCase();}
+const TINT_FILTER="grayscale(1) sepia(1) saturate(1.7) hue-rotate(-38deg) brightness(.95) contrast(1.05)";
+async function compressImage(file,{maxDim=1920,quality=.82,tint=""}={}){
+  try{
+    let src,w,h;
+    if(window.createImageBitmap){src=await createImageBitmap(file);w=src.width;h=src.height;}
+    else{const url=URL.createObjectURL(file);try{src=new Image();await new Promise((res,rej)=>{src.onload=res;src.onerror=rej;src.src=url;});w=src.naturalWidth;h=src.naturalHeight;}finally{URL.revokeObjectURL(url);}}
+    if(!w||!h)throw new Error("no-dims");
+    const scale=Math.min(1,maxDim/Math.max(w,h));
+    const cw=Math.max(1,Math.round(w*scale)),ch=Math.max(1,Math.round(h*scale));
+    const canvas=document.createElement("canvas");canvas.width=cw;canvas.height=ch;
+    const ctx=canvas.getContext("2d");if(tint)ctx.filter=tint;ctx.drawImage(src,0,0,cw,ch);
+    if(src.close)src.close();
+    const blob=await new Promise(res=>canvas.toBlob(res,"image/jpeg",quality));
+    if(!blob)throw new Error("tobob-failed");
+    return blob;
+  }catch{return file;}
+}
 async function uploadAvatar(file){
-  const path=`${session.user.id}/avatar.${extOf(file)}`;
-  const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true,contentType:file.type||"image/jpeg"});
+  const blob=await compressImage(file,{maxDim:512,quality:.85,tint:TINT_FILTER});
+  const ext=blob===file?extOf(file):"jpg";
+  const path=`${session.user.id}/avatar.${ext}`;
+  const{error}=await supabase.storage.from("avatars").upload(path,blob,{upsert:true,contentType:blob.type||file.type||"image/jpeg"});
   if(error)return{ok:false,error};
   await supabase.from("profiles").update({avatar_url:path}).eq("id",session.user.id);
   await loadProfile();return{ok:true};
 }
 async function uploadMaterialImage(file){
-  const path=`${Date.now()}-${(file.name||"image").replace(/[^a-z0-9_.-]/gi,"_")}`;
-  const{error}=await supabase.storage.from("materials").upload(path,file,{contentType:file.type||"image/jpeg"});
+  const blob=await compressImage(file,{maxDim:1920,quality:.82});
+  const ext=blob===file?extOf(file):"jpg";
+  const base=(file.name||"image").replace(/\.[a-z0-9]+$/i,"").replace(/[^a-z0-9_.-]/gi,"_");
+  const path=`${Date.now()}-${base}.${ext}`;
+  const{error}=await supabase.storage.from("materials").upload(path,blob,{contentType:blob.type||file.type||"image/jpeg"});
   return error?{ok:false,error}:{ok:true,path};
 }
 async function signedMaterialUrl(path){
