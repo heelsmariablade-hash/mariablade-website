@@ -1,0 +1,644 @@
+(function(){
+"use strict";
+const T={
+uk:{
+skip:"Перейти до змісту",navLabel:"Головна навігація",menu:"Меню",
+nAbout:"Про Марію",nBook:"Запис",nMat:"Матеріали",nArt:"Мистецтво",ctaNav:"Записатися на заняття",ctaShort:"Запис",
+tagline:"Танцівниця · педагог · авторка",quote:"«Рух як спосіб пізнання себе.»",portraitAlt:"Марія в танцювальній позі, одна рука піднята над головою, друга витягнута вбік, на руках мереживні рукавички",
+bioLead:"Танцювальна практика, тілесна усвідомленість та авторський підхід до руху.",
+bio1:"Марія викладає танець з 2020 року і працює з учнями різного віку та рівня підготовки, у групах та індивідуально. У роботі спирається на класичну танцювальну техніку, біомеханіку руху, баланс, координацію, музикальність і виразність.",
+bio2:"Психологічна освіта дає їй точніший погляд на зв'язок тіла, уваги і самовідчуття. Марія розвиває власну танцювальну манеру і візуальну ідентичність, бере участь у танцювальних кемпах, фестивалях та освітніх поїздках Європою.",
+fx1t:"з 2020",fx1:"Викладання танцю",fx2t:"Освіта",fx2:"Психологічна освіта · класична танцювальна техніка",fx3t:"Формати",fx3:"Групові заняття · індивідуальне навчання",
+fx4t:"Розвиток",fx4:"Кемпи, фестивалі та освітні поїздки Європою",fx5t:"Проєкти",fx5:"CHERNAMARS — муза і співавторка · MADDER — співзасновниця студії",
+pr1m:"Індивідуально",pr1:"Техніка і контроль руху, баланс і координація, музикальність, лінії тіла, власний стиль і робота над хореографією. З нуля або для розвитку того, що вже вмієте.",
+pr2m:"Індивідуально",pr2t:"Тілесна <em>практика</em>",pr2:"Увага до відчуттів, дослідження руху, присутність і виразність, усвідомлена взаємодія з простором. Тут немає правильного чи неправильного руху.",
+
+bkEyebrow:"Запис",bkTitle:"Почати <em>з розмови</em>",bkLead:"Опишіть, з чим хочете працювати. Марія відповість і запропонує формат, час і умови заняття.",
+o1:"High Heels",o2:"Тілесна практика",o3:"Індивідуальна хореографія",o4:"Творча співпраця",
+lDir:"Напрям",lLevel:"Рівень підготовки",sel:"Оберіть",lvA:"Починаю з нуля",lvB:"Є трохи досвіду",lvC:"Танцюю регулярно",lvD:"Професійно",
+lGoal:"Мета заняття",pGoal:"Напр. впевненість на підборах",lMethod:"Спосіб зв'язку",lContact:"Контакт",pContact:"@нікнейм, номер або email",
+lComment:"Коментар",pComment:"Що важливо знати: досвід, побажання щодо часу, питання",
+lConsent:"Погоджуюсь на обробку моїх контактних даних лише для відповіді на цю заявку.",
+privSum:"Як використовуються дані",privTxt:"Форма збирає тільки те, що потрібно для відповіді: напрям, рівень, мету, контакт і коментар. Дані не передаються третім особам і не використовуються для розсилок.",
+send:"Сформувати заявку",joinBtn:"Стати ученицею",joinQ:"Що означає бути ученицею",joinTitle:"Що означає бути ученицею Марії",join1:"Бути частиною дружнього колективу, де танець вивчають як спосіб самовираження душі й тіла.",join2:"Доступ до навчальних матеріалів Марії: кожен матеріал вона відкриває особисто.",join3:"Особистий профіль з історією занять, швидкий запис на вільні дати і прямий зв'язок з Марією.",channelOff:"Автоматична відправка ще не підключена",
+eDir:"Оберіть напрям заняття.",eLevel:"Оберіть рівень підготовки.",eGoal:"Опишіть мету хоча б кількома словами (від 3 символів).",
+eMethod:"Оберіть, як з вами зв'язатися.",eContact:"Вкажіть контакт.",eEmail:"Схоже, в email помилка. Приклад: name@mail.com",
+ePhone:"Вкажіть номер у міжнародному форматі, наприклад +380…",eHandle:"Вкажіть нікнейм, наприклад @name",eConsent:"Потрібна згода, щоб Марія могла відповісти.",
+rEyebrow:"Заявку сформовано · не відправлено",rTitle:"Залишився один крок",
+rText:"Канал доставки заявок ще налаштовується, тому сайт не надсилає її автоматично. Скопіюйте текст і надішліть його Марії в Instagram.",
+copy:"Скопіювати текст",openIg:"Відкрити Instagram",edit:"Змінити заявку",copied:"Скопійовано",copyFail:"Виділіть текст вручну",
+mHead:"Заявка з сайту mariablade.com",mDir:"Напрям",mLevel:"Рівень",mGoal:"Мета",mMethod:"Зв'язок",mContact:"Контакт",mComment:"Коментар",
+dirs:{heels:"High Heels",body:"Тілесна практика",choreo:"Індивідуальна хореографія",collab:"Творча співпраця"},
+nTrain:"Досвід",trEyebrow:"Досвід",trTitle:"Шлях, що сформував <em>рух</em>",
+trNote:"Приклади. Марія заповнить цей розділ своїми кемпами, педагогами і фото з подій.",trList:"Досвід: стрічка подій",pqText:"Тут буде текст Марії: як вона навчалася, у кого, що її надихало і чому рух став для неї способом пізнання себе. Своїми словами, як цитата.",pqEx:"чернетка",trPrev:"Назад",trNext:"Далі",
+tr1k:"Спеціальний перформанс",trYk:"Хореографія Ярослави",tr6t:"Tell me",tr6p:"Танцюють: @yaroslaava, @maria_blade, @eliaklius · музика: @whosjakedaniel",tr7t:"would you mind",tr7p:"Хореографія: @yaroslaava",vidTell:"Тріо танцює хореографію Ярослави в залі з теплим світлом",vidWym:"Хореографія Ярослави на темній сцені в червоному світлі",tr1t:"Перформанс у хореографії Ярослави",tr1p:"Хореографія: Ярослава · @yaroslaava",
+tr2k:"Кемп",tr2t:"Heels Camp",tr3k:"Інтенсив",tr3t:"Contemporary Intensive",tr4k:"Фестиваль",tr4t:"Dance Festival",tr5k:"Майстер-клас",tr5t:"Floor Work Masterclass",
+trPerson:"Педагог: Ім'я Прізвище",ex:"приклад",hand:"місто, рік",phEvent:"Фото з події",
+matEyebrow:"Матеріали",matTitle:"Рух <em>у кадрі</em>",gr1:"Хореографії",gr1d:"Постановки і виступи.",gr2:"Кемпи і фестивалі",gr2d:"Танцювальні кемпи і фестивалі в Європі.",
+gr3:"Поїздки",gr3d:"Освітні поїздки та навчання.",phVideo:"Відео",phPhoto:"Фото",
+vid1Cap:"Хореографія · @yaroslaava",vid1Label:"Марія танцює в партері на темній сцені з червоним світлом",vid2Label:"Марія танцює High Heels у залі з арковими вікнами",
+vPlay:"Відтворити",vPause:"Пауза",vSoundOn:"Увімкнути звук",vSoundOff:"Вимкнути звук",
+artLabel:"Мистецтво · CHERNAMARS · MADDER",artTitle:"Світ, у якому рух ставав мистецтвом",artOpen:"Відкрити історію",artClose:"Згорнути",chPhotos:"Фото з проєктів",chAlt1:"Марія на колінах на червоному тлі, тіло вкрите чорно-червоним гримом, навколо чорні волокна, схожі на крила",chAlt2:"Колаж: Марія з татуюваннями серед червоних рослин під марсіанським небом з двома місяцями",chAlt3:"Марія в чорній скульптурній масці з шипами на червоному тлі, над нею логотип MADDER",lbClose:"Закрити",lbPrev:"Попереднє фото",lbNext:"Наступне фото",
+chLead:"Марія була музою і співавторкою мистецтва CHERNAMARS, а згодом стала співзасновницею студії MADDER.",
+chP1:"CHERNAMARS — художній всесвіт марсіанського футуризму. Разом з автором проєкту Марія уявляла, яким може бути той світ: його люди, їхні вірування і філософія, мистецтво, танці і сам спосіб рухатися. Частина цієї візуальної мови живе на її тілі, у татуюваннях, кожне з яких має власний унікальний дизайн.",
+chP2:"У студії MADDER концепція отримувала тіло в реальному світі: перформанси, татуювання, підготовка проєктів і системна робота над тим, щоб ідея ставала дедалі відчутнішою. Червоне і чорне, чуттєвість, відчуття гармонії, природи і духовного виміру людини: смак Марії багато в чому визначив характер цих проєктів.",
+chP3:"Цей досвід став для неї творчою школою: мислити образом і системою одночасно та працювати з концепцією, простором і тілом як з єдиним матеріалом.",
+chNextLabel:"Що виросло з цього досвіду",g1:"модні вистави",g2:"постановка шоу",g3:"інсталяції з рухом тіла",g4:"філософське дослідження пластики",
+chNext:"З цими ідеями Марія відкрита до творчих колаборацій.",chCta:"Обговорити співпрацю",
+ftNav:"Навігація",ftLang:"Мова",ftContact:"Контакт",ftRights:"Maria Blade. Усі права на тексти, фото і відео належать авторці.",
+proto:"Прототип mariablade.com. Частина фото і текстів тимчасова та буде замінена реальними матеріалами.",
+docTitle:"Maria Blade — рух як спосіб пізнання себе"
+},
+en:{
+skip:"Skip to content",navLabel:"Main navigation",menu:"Menu",
+nAbout:"About Maria",nBook:"Booking",nMat:"Materials",nArt:"Art",ctaNav:"Book a session",ctaShort:"Book",
+tagline:"Dancer · teacher · author",quote:"“Movement as a way of knowing yourself.”",portraitAlt:"Maria in a dance pose, one arm raised overhead, the other extended to the side, wearing lace gloves",
+bioLead:"Dance practice, embodied awareness and an individual approach to movement.",
+bio1:"Maria has taught dance since 2020, working with students of different ages and levels, in groups and one to one. Her work rests on classical dance technique, biomechanics, balance, coordination, musicality and expressiveness.",
+bio2:"Her background in psychology gives her a sharper view of how body, attention and self-perception connect. Maria develops her own dance manner and visual identity, and takes part in dance camps, festivals and study trips across Europe.",
+fx1t:"since 2020",fx1:"Teaching dance",fx2t:"Education",fx2:"Psychology · classical dance technique",fx3t:"Formats",fx3:"Group classes · private tuition",
+fx4t:"Growth",fx4:"Camps, festivals and study trips across Europe",fx5t:"Projects",fx5:"CHERNAMARS — muse and co-author · MADDER — studio co-founder",
+pr1m:"Private",pr1:"Technique and control, balance and coordination, musicality, body lines, your own style and work on choreography. From zero, or to develop what you already have.",
+pr2m:"Private",pr2t:"Embodied <em>practice</em>",pr2:"Attention to sensation, exploring movement, presence and expression, conscious interaction with space. There is no right or wrong movement here.",
+
+bkEyebrow:"Booking",bkTitle:"Start <em>with a conversation</em>",bkLead:"Tell Maria what you would like to work on. She will reply and suggest a format, time and terms.",
+o1:"High Heels",o2:"Embodied practice",o3:"Private choreography",o4:"Creative collaboration",
+lDir:"Direction",lLevel:"Experience",sel:"Choose",lvA:"Starting from zero",lvB:"A little experience",lvC:"I dance regularly",lvD:"Professional",
+lGoal:"Goal of the session",pGoal:"e.g. confidence in heels",lMethod:"Preferred contact",lContact:"Contact",pContact:"@handle, phone or email",
+lComment:"Comment",pComment:"Anything useful: experience, preferred times, questions",
+lConsent:"I agree to my contact details being used only to reply to this request.",
+privSum:"How your data is used",privTxt:"The form collects only what is needed to reply: direction, level, goal, contact and comment. Data is not shared with third parties or used for mailing lists.",
+send:"Prepare request",joinBtn:"Become a student",joinQ:"What it means to be a student",joinTitle:"What it means to be Maria's student",join1:"Being part of a close community where dance is studied as a way for soul and body to express themselves.",join2:"Access to Maria's learning materials: she opens each one personally.",join3:"A personal profile with your session history, quick booking of free dates and a direct line to Maria.",channelOff:"Automatic sending is not connected yet",
+eDir:"Choose a direction.",eLevel:"Choose your experience level.",eGoal:"Describe your goal in a few words (at least 3 characters).",
+eMethod:"Choose how to contact you.",eContact:"Enter your contact.",eEmail:"This email looks mistyped. Example: name@mail.com",
+ePhone:"Enter the number in international format, e.g. +44…",eHandle:"Enter a handle, e.g. @name",eConsent:"Consent is needed so Maria can reply.",
+rEyebrow:"Request prepared · not sent",rTitle:"One step left",
+rText:"The delivery channel is still being set up, so the site does not send requests automatically. Copy the text and send it to Maria on Instagram.",
+copy:"Copy text",openIg:"Open Instagram",edit:"Edit request",copied:"Copied",copyFail:"Select the text manually",
+mHead:"Request from mariablade.com",mDir:"Direction",mLevel:"Experience",mGoal:"Goal",mMethod:"Contact via",mContact:"Contact",mComment:"Comment",
+dirs:{heels:"High Heels",body:"Embodied practice",choreo:"Private choreography",collab:"Creative collaboration"},
+nTrain:"Experience",trEyebrow:"Experience",trTitle:"The path that shaped <em>her movement</em>",
+trNote:"Examples. Maria will fill this section with her own camps, teachers and event photos.",trList:"Experience: event ribbon",pqText:"Here Maria will write how she trained, with whom, what inspired her and why movement became her way of knowing herself. In her own words, like a quote.",pqEx:"draft",trPrev:"Previous",trNext:"Next",
+tr1k:"Special performance",trYk:"Choreography by Yaroslava",tr6t:"Tell me",tr6p:"Dancers: @yaroslaava, @maria_blade, @eliaklius · music: @whosjakedaniel",tr7t:"would you mind",tr7p:"Choreography: @yaroslaava",vidTell:"A trio dancing Yaroslava's choreography in a warmly lit studio",vidWym:"Yaroslava's choreography on a dark stage in red light",tr1t:"A performance choreographed by Yaroslava",tr1p:"Choreography: Yaroslava · @yaroslaava",
+tr2k:"Camp",tr2t:"Heels Camp",tr3k:"Intensive",tr3t:"Contemporary Intensive",tr4k:"Festival",tr4t:"Dance Festival",tr5k:"Masterclass",tr5t:"Floor Work Masterclass",
+trPerson:"Teacher: Name Surname",ex:"example",hand:"city, year",phEvent:"Event photo",
+matEyebrow:"Materials",matTitle:"Movement <em>on camera</em>",gr1:"Choreography",gr1d:"Pieces and performances.",gr2:"Camps and festivals",gr2d:"Dance camps and festivals across Europe.",
+gr3:"Trips",gr3d:"Study trips and training.",phVideo:"Video",phPhoto:"Photo",
+vid1Cap:"Choreography · @yaroslaava",vid1Label:"Maria dancing floor work on a dark stage in red light",vid2Label:"Maria dancing High Heels in a hall with arched windows",
+vPlay:"Play",vPause:"Pause",vSoundOn:"Turn sound on",vSoundOff:"Mute",
+artLabel:"Art · CHERNAMARS · MADDER",artTitle:"A world where movement became art",artOpen:"Open the story",artClose:"Close",chPhotos:"Photos from the projects",chAlt1:"Maria kneeling against red, her body covered in black and red paint, black fibres around her like wings",chAlt2:"Collage: Maria with her tattoos among red plants under a Martian sky with two moons",chAlt3:"Maria in a black sculptural mask with thorns against red, the MADDER logo above her",lbClose:"Close",lbPrev:"Previous photo",lbNext:"Next photo",
+chLead:"Maria was the muse and co-author of the CHERNAMARS art, and later co-founded the MADDER studio.",
+chP1:"CHERNAMARS is an artistic universe of Martian futurism. Together with the project's author, Maria imagined what that world could be: its people, their beliefs and philosophy, their art, their dances and their very way of moving. Part of this visual language lives on her body, in tattoos that each carry a unique design.",
+chP2:"At the MADDER studio the concept took on a body in the real world: performances, tattoos, preparing projects and systematic work to make the idea ever more tangible. Red and black, sensuality, a feeling for harmony, nature and the spiritual side of a person: Maria's taste shaped much of the character of these projects.",
+chP3:"This experience became her creative school: thinking in images and in systems at once, and working with concept, space and body as a single material.",
+chNextLabel:"What grew from this experience",g1:"fashion performances",g2:"staging shows",g3:"installations with the moving body",g4:"philosophical research of movement",
+chNext:"With these ideas Maria is open to creative collaborations.",chCta:"Discuss a collaboration",
+ftNav:"Navigation",ftLang:"Language",ftContact:"Contact",ftRights:"Maria Blade. All rights to texts, photos and videos belong to the author.",
+proto:"Prototype of mariablade.com. Some photos and texts are temporary and will be replaced with real material.",
+docTitle:"Maria Blade — movement as a way of knowing yourself"
+}};
+
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* Each page is served at its own URL (/uk/ or /en/) so the language comes from <html lang>, not from client-side state. */
+let lang=document.documentElement.getAttribute("lang")==="en"?"en":"uk";
+
+/* ---------- glass: red drop blooms where the button is pressed ---------- */
+function bloom(el,x,y){el.style.setProperty("--dx",x+"px");el.style.setProperty("--dy",y+"px");el.classList.remove("drop");void el.offsetWidth;el.classList.add("drop");}
+document.addEventListener("pointerdown",e=>{const g=e.target.closest(".glass");if(!g)return;const r=g.getBoundingClientRect();bloom(g,e.clientX-r.left,e.clientY-r.top);});
+document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const g=e.target.closest&&e.target.closest(".glass");if(g)bloom(g,g.offsetWidth/2,g.offsetHeight/2);
+  const lbl=e.target.closest&&e.target.closest(".chips label");if(lbl&&e.key===" "){const sp=lbl.querySelector(".glass");bloom(sp,sp.offsetWidth/2,sp.offsetHeight/2);}});
+document.addEventListener("animationend",e=>{if(e.animationName==="bloodfill")e.target.classList.remove("drop");});
+document.querySelectorAll(".chips input").forEach(i=>i.addEventListener("change",()=>{const sp=i.nextElementSibling;if(i.checked&&!sp.classList.contains("drop"))bloom(sp,sp.offsetWidth/2,sp.offsetHeight/2);}));
+
+/* ---------- nav ---------- */
+const nav=$("nav"),menu=$("menu"),menuBtn=$("menuBtn");
+function closeMenu(){menu.classList.remove("open");document.body.classList.remove("menu-open");menuBtn.setAttribute("aria-expanded","false");}
+menuBtn.addEventListener("click",()=>{const o=!menu.classList.contains("open");menu.classList.toggle("open",o);document.body.classList.toggle("menu-open",o);menuBtn.setAttribute("aria-expanded",String(o));if(o)menu.querySelector("a").focus({preventScroll:true});});
+menu.addEventListener("click",e=>{if(e.target.closest("a"))closeMenu();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&menu.classList.contains("open")){closeMenu();menuBtn.focus();}});
+matchMedia("(min-width:1024px)").addEventListener("change",e=>{if(e.matches)closeMenu();});
+const links=[...menu.querySelectorAll("a")];
+if("IntersectionObserver" in window){
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)links.forEach(a=>a.setAttribute("aria-current",String(a.getAttribute("href")==="#"+en.target.id)));});},{rootMargin:"-45% 0px -50% 0px"});
+  ["about","booking","materials","training","art"].forEach(id=>io.observe($(id)));
+}
+const matEl=$("materials"),artEl=$("art");
+const absTop=el=>el.getBoundingClientRect().top+scrollY;
+function tone(){const t=absTop($("materials"))+innerHeight*.35;const d=scrollY+40>t;nav.dataset.tone=d?"dark":"light";
+  document.documentElement.style.setProperty("--navbg",d?"rgba(12,5,7,.42)":"rgba(243,238,228,.62)");}
+addEventListener("scroll",tone,{passive:true});
+$("year").textContent=new Date().getFullYear();
+
+/* ---------- living background: BLACK WATER ink field, ivory → blood → black space by page depth ---------- */
+const trEl=$("training");
+const bgc=$("bgc");let gl=null,uni={},raf=0,running=false,K=.55;
+try{gl=bgc.getContext("webgl",{antialias:false,alpha:false,depth:false,stencil:false,powerPreference:"low-power"});}catch(e){gl=null;}
+const VS="attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+/* the soak profile, sampled from the reference: long white, rose, brick red, then straight into black */
+const RAMP=["#ffffff","#fefefe","#fffdfe","#fefcfd","#fdfbfc","#fcf8f7","#faf4f4","#f7eeef","#f3e7e7","#efdfdf","#ead0d1","#dfc1c1","#d7b0b1","#ce9e9e","#c1898a","#b37172","#a65c5d","#944646","#843332","#6e2222","#5a1518","#460c0b","#320607","#210303","#150102"];
+const GH=2.2; /* the gradient is this many screens tall */
+const FS=`precision highp float;
+uniform vec2 uRes;uniform float uK;uniform float uTop;uniform sampler2D uRamp;
+float h1(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h1(i),h1(i+vec2(1,0)),f.x),mix(h1(i+vec2(0,1)),h1(i+vec2(1,1)),f.x),f.y);}
+void main(){
+  vec2 css=gl_FragCoord.xy/uK;
+  float yTop=1.-css.y/uRes.y;
+  float x=css.x/uRes.y;
+  /* the edge of the wet cloth is almost level, with a barely visible wander */
+  float wave=(n2(vec2(x*1.1,yTop*.4+3.))*.65+n2(vec2(x*2.6,yTop*.9+7.))*.35-.5)*.035;
+  float u=clamp(uTop+yTop/${GH.toFixed(2)}+wave,0.,1.);
+  vec3 c=texture2D(uRamp,vec2(u,.5)).rgb;
+  c+=(h1(gl_FragCoord.xy)-.5)/255.;
+  gl_FragColor=vec4(c,1.);
+}`;
+function glInit(){
+  const sh=(type,src)=>{const o=gl.createShader(type);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o;};
+  const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error("link");
+  gl.useProgram(pr);
+  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const a=gl.getAttribLocation(pr,"a");gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+  ["uRes","uK","uTop","uRamp"].forEach(n=>uni[n]=gl.getUniformLocation(pr,n));
+  /* ramp texture: the reference colours, multiplied by the site's ivory so the light end matches the page */
+  const rc=document.createElement("canvas");rc.width=512;rc.height=1;const rx=rc.getContext("2d"),lg=rx.createLinearGradient(0,0,512,0);
+  RAMP.forEach((h,i)=>{const n=parseInt(h.slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;lg.addColorStop(i/(RAMP.length-1),`rgb(${Math.round(r*243/255)},${Math.round(g*238/255)},${Math.round(b*228/255)})`);});
+  rx.fillStyle=lg;rx.fillRect(0,0,512,1);
+  const tx=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tx);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,rc);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.uniform1i(uni.uRamp,0);
+}
+try{if(gl){glInit();document.documentElement.classList.add("live");}}catch(e){gl=null;}
+/* where the gradient's top edge sits on screen (in gradient lengths) for each scroll position:
+   just below the screen at rest, rose under the form, brick red into black at training, all black at art */
+let lv=[[0,0],[1,1]];
+/* the first red section is the materials, the training follows it */
+function setStops(){const vh=innerHeight,H=document.documentElement.scrollHeight,bk=absTop($("booking")),tr=absTop(matEl),mt=absTop(trEl),ar=absTop(artEl);
+  const u0=.3-1/GH,pts=[[0,u0],[bk,.04],[tr-.5*vh,.26],[tr+.35*vh,.72],[mt,.84],[ar-.7*vh,1.0],[H,1.05]];
+  for(let i=1;i<pts.length;i++)pts[i][0]=Math.max(pts[i][0],pts[i-1][0]+1);lv=pts;}
+function levelAt(y){for(let i=1;i<lv.length;i++)if(y<=lv[i][0]){const a=lv[i-1],b=lv[i];return a[1]+(b[1]-a[1])*Math.max(0,y-a[0])/(b[0]-a[0]);}return lv[lv.length-1][1];}
+function glSize(){if(!gl)return;K=innerWidth<700?.6:innerWidth>1600?.45:.55;
+  bgc.width=Math.max(1,Math.round(innerWidth*K));bgc.height=Math.max(1,Math.round(innerHeight*K));gl.viewport(0,0,bgc.width,bgc.height);
+  gl.uniform2f(uni.uRes,innerWidth,innerHeight);gl.uniform1f(uni.uK,K);}
+/* the pigment follows the scroll with a little lag, as if soaking in; nothing moves while you don't scroll */
+let shown=null,lastT=0;
+function frame(ts){const dt=lastT?Math.min(.1,(ts-lastT)/1000):0;lastT=ts;const tgt=levelAt(scrollY);
+  if(shown===null||reduce)shown=tgt;else shown+=(tgt-shown)*(1-Math.exp(-dt*3));
+  gl.uniform1f(uni.uTop,shown);gl.drawArrays(gl.TRIANGLES,0,3);
+  if(Math.abs(tgt-shown)>.0004)raf=requestAnimationFrame(frame);else{running=false;lastT=0;}}
+function bgUpdate(){if(!gl||running)return;running=true;raf=requestAnimationFrame(frame);}
+addEventListener("scroll",bgUpdate,{passive:true});
+
+let rT=0;function relayout(){clearTimeout(rT);rT=setTimeout(()=>{glSize();setStops();tone();bgUpdate();},120);}
+addEventListener("resize",relayout);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(relayout);
+addEventListener("load",relayout);
+
+/* ---------- cadmium jungle: real image if present, painted stand-in otherwise ---------- */
+function paintJungle(){
+  const c=document.createElement("canvas"),w=1600,h=900;c.width=w;c.height=h;const g=c.getContext("2d");
+  let s=11;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+  const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,"#2a0a0b");sky.addColorStop(.55,"#4a0f0e");sky.addColorStop(1,"#120405");g.fillStyle=sky;g.fillRect(0,0,w,h);
+  const sun=g.createRadialGradient(w*.72,h*.3,0,w*.72,h*.3,h*.7);sun.addColorStop(0,"rgba(255,170,120,.35)");sun.addColorStop(1,"rgba(255,170,120,0)");g.fillStyle=sun;g.fillRect(0,0,w,h);
+  const pal=["#b3121c","#d23a12","#e8641a","#8c0d14","#f08a24","#6e0a10"];
+  for(let layer=0;layer<4;layer++){
+    g.filter=`blur(${(3-layer)*2.2}px)`;const dark=.55+layer*.15;
+    for(let i=0;i<46-layer*6;i++){
+      const x=rnd()*w,top=h*(.05+rnd()*.5),bend=(rnd()-.5)*220,wd=2+rnd()*(4+layer*3);
+      g.strokeStyle=pal[Math.floor(rnd()*pal.length)];g.globalAlpha=dark*(.5+rnd()*.5);g.lineWidth=wd;g.lineCap="round";
+      g.beginPath();g.moveTo(x,h+20);g.bezierCurveTo(x+bend*.3,h*.7,x+bend,top+120,x+bend*.8,top);g.stroke();
+      const lx=x+bend*.8,ly=top;
+      for(let l=0;l<5+Math.floor(rnd()*5);l++){const ang=-Math.PI/2+(rnd()-.5)*2.6,len=40+rnd()*(90+layer*30);
+        g.fillStyle=pal[Math.floor(rnd()*pal.length)];g.globalAlpha=dark*(.45+rnd()*.45);
+        g.save();g.translate(lx,ly);g.rotate(ang);g.beginPath();g.ellipse(len/2,0,len/2,len*.12,0,0,6.283);g.fill();g.restore();}
+    }
+    g.filter=`blur(${(3-layer)*1.5}px)`;g.globalAlpha=.85;g.fillStyle="#090607";
+    for(let i=0;i<14;i++){const x=rnd()*w,y=h*(.45+rnd()*.55),r=18+rnd()*60;g.beginPath();g.ellipse(x,y,r*1.4,r,0,0,6.283);g.fill();}
+  }
+  g.filter="none";g.globalAlpha=1;
+  const floor=g.createLinearGradient(0,h*.75,0,h);floor.addColorStop(0,"rgba(18,4,5,0)");floor.addColorStop(1,"rgba(18,4,5,.9)");g.fillStyle=floor;g.fillRect(0,0,w,h);
+  return c.toDataURL("image/jpeg",.82);
+}
+const band=$("band"),panel=$("artPanel");
+function setJungle(url){$("bandBg").style.backgroundImage=`url("${url}")`;}
+const real=new Image();real.onload=()=>setJungle(real.src);real.onerror=()=>setJungle(paintJungle());real.src="/assets/images/cadmium-jungle.jpg";
+function setBand(open){$("artCard").classList.toggle("open",open);band.setAttribute("aria-expanded",String(open));panel.classList.toggle("open",open);$("bandHint").textContent=T[lang][open?"artClose":"artOpen"];}
+band.addEventListener("click",()=>setBand(band.getAttribute("aria-expanded")!=="true"));
+const lb=$("lb"),thumbs=[...document.querySelectorAll(".thumb")];let lbI=0,lbFrom=null;
+function lbShow(i){lbI=(i+thumbs.length)%thumbs.length;const t=thumbs[lbI],im=t.querySelector("img");
+  $("lbImg").src=t.dataset.full;$("lbImg").alt=im.alt;$("lbCap").textContent=im.alt;$("lbNum").textContent=`${lbI+1} / ${thumbs.length}`;}
+thumbs.forEach((t,i)=>t.addEventListener("click",()=>{lbFrom=t;lbShow(i);if(lb.showModal)lb.showModal();else lb.setAttribute("open","");$("lbClose").focus();}));
+$("lbPrev").addEventListener("click",()=>lbShow(lbI-1));$("lbNext").addEventListener("click",()=>lbShow(lbI+1));
+$("lbClose").addEventListener("click",()=>lb.close());
+lb.addEventListener("click",e=>{if(e.target===lb)lb.close();});
+lb.addEventListener("keydown",e=>{if(e.key==="ArrowLeft")lbShow(lbI-1);else if(e.key==="ArrowRight")lbShow(lbI+1);});
+lb.addEventListener("close",()=>{if(lbFrom)lbFrom.focus({preventScroll:true});});
+panel.addEventListener("transitionend",e=>{if(e.target===panel)relayout();});
+
+/* ---------- media: missing photos keep their placeholder; videos play while visible ---------- */
+document.querySelectorAll(".frame img").forEach(img=>{if(img.complete&&img.naturalWidth===0)img.remove();else img.addEventListener("error",()=>img.remove());});
+const vids=[...document.querySelectorAll(".vid")];
+vids.forEach(fig=>{
+  const v=fig.querySelector("video"),pb=fig.querySelector('[data-act="play"]'),sb=fig.querySelector('[data-act="sound"]');
+  let held=reduce;
+  const sync=()=>{const d=T[lang];pb.dataset.on=String(!v.paused);pb.setAttribute("aria-label",v.paused?d.vPlay:d.vPause);sb.dataset.on=String(!v.muted);sb.setAttribute("aria-label",v.muted?d.vSoundOn:d.vSoundOff);sb.setAttribute("aria-pressed",String(!v.muted));};
+  fig._sync=sync;
+  const tryPlay=()=>{const p=v.play();if(p&&p.catch)p.catch(()=>{});};
+  ["play","pause","volumechange"].forEach(ev=>v.addEventListener(ev,sync));
+  const fail=()=>fig.classList.add("failed");
+  v.addEventListener("error",fail);fig.querySelector("source:last-of-type").addEventListener("error",fail);
+  pb.addEventListener("click",()=>{if(v.paused){held=false;tryPlay();}else{held=true;v.pause();}});
+  sb.addEventListener("click",()=>{const on=v.muted;if(on)vids.forEach(o=>{const ov=o.querySelector("video");if(ov!==v)ov.muted=true;});v.muted=!on;if(on&&v.paused){held=false;tryPlay();}});
+  if("IntersectionObserver" in window)new IntersectionObserver(([e])=>{if(e.isIntersecting&&!held)tryPlay();else if(!e.isIntersecting)v.pause();},{threshold:.3}).observe(fig);
+  sync();
+});
+
+/* ---------- training ribbon: buttons, progress, drag ---------- */
+const rb=$("ribbon"),rbBar=$("rbBar");
+function rbStep(){const c=rb.querySelector(".pol-card");return c?c.getBoundingClientRect().width+parseFloat(getComputedStyle(rb).columnGap||0):300;}
+function rbSync(){const max=rb.scrollWidth-rb.clientWidth;const w=rb.clientWidth/rb.scrollWidth;
+  rbBar.style.width=(w*100)+"%";rbBar.style.left=(max>0?rb.scrollLeft/rb.scrollWidth*100:0)+"%";
+  $("rbPrev").setAttribute("aria-disabled",String(rb.scrollLeft<4));$("rbNext").setAttribute("aria-disabled",String(rb.scrollLeft>max-4));
+  rb.classList.toggle("at-end",rb.scrollLeft>max-4);rb.parentElement.querySelector(".ribbon-ctl").hidden=max<=4;}
+$("rbPrev").addEventListener("click",()=>rb.scrollBy({left:-rbStep(),behavior:reduce?"auto":"smooth"}));
+$("rbNext").addEventListener("click",()=>rb.scrollBy({left:rbStep(),behavior:reduce?"auto":"smooth"}));
+rb.addEventListener("scroll",rbSync,{passive:true});addEventListener("resize",rbSync);
+rb.addEventListener("keydown",e=>{if(e.target!==rb)return;if(e.key==="ArrowRight"){e.preventDefault();$("rbNext").click();}else if(e.key==="ArrowLeft"){e.preventDefault();$("rbPrev").click();}});
+let dr=null;
+rb.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.target.closest("button"))return;dr={x:e.clientX,l:rb.scrollLeft,moved:false};});
+addEventListener("pointermove",e=>{if(!dr)return;const dx=e.clientX-dr.x;if(Math.abs(dx)>4){dr.moved=true;rb.classList.add("dragging");}if(dr.moved)rb.scrollLeft=dr.l-dx;});
+addEventListener("pointerup",()=>{if(!dr)return;const moved=dr.moved;dr=null;rb.classList.remove("dragging");
+  if(moved){const i=Math.round(rb.scrollLeft/rbStep());rb.scrollTo({left:i*rbStep(),behavior:reduce?"auto":"smooth"});rb.addEventListener("click",ev=>ev.preventDefault(),{capture:true,once:true});}});
+rbSync();
+
+/* ---------- booking form ---------- */
+const form=$("bookForm"),result=$("result"),msgEl=$("msg");
+function setErr(name,key){const wrap=$("f-"+name),e=$("e-"+name);e.textContent=key?T[lang][key]:"";wrap.classList.toggle("invalid",!!key);
+  const ctl=wrap.querySelector("input,select,textarea");if(ctl){if(key){ctl.setAttribute("aria-invalid","true");ctl.setAttribute("aria-describedby","e-"+name);}else ctl.removeAttribute("aria-invalid");}return !key;}
+function values(){const fd=new FormData(form);return{direction:fd.get("direction")||"",level:fd.get("level")||"",goal:(fd.get("goal")||"").trim(),method:fd.get("method")||"",contact:(fd.get("contact")||"").trim(),comment:(fd.get("comment")||"").trim(),consent:$("consent").checked};}
+function contactErr(m,c){if(!c)return"eContact";
+  if(m==="email")return/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(c)?null:"eEmail";
+  if(m==="whatsapp")return/^\+?[\d\s()-]{8,20}$/.test(c)?null:"ePhone";
+  if(m==="instagram"||m==="telegram")return/^@?[A-Za-z0-9._]{3,32}$/.test(c)||/^\+?[\d\s()-]{8,20}$/.test(c)?null:"eHandle";
+  return c.length>=3?null:"eContact";}
+function validate(focus){const v=values(),bad=[];
+  if(!setErr("direction",v.direction?null:"eDir"))bad.push(form.querySelector("input[name=direction]"));
+  if(!setErr("level",v.level?null:"eLevel"))bad.push($("level"));
+  if(!setErr("goal",v.goal.length>=3?null:"eGoal"))bad.push($("goal"));
+  if(!setErr("method",v.method?null:"eMethod"))bad.push($("method"));
+  if(!setErr("contact",contactErr(v.method,v.contact)))bad.push($("contact"));
+  if(!setErr("consent",v.consent?null:"eConsent"))bad.push($("consent"));
+  if(focus&&bad.length)bad[0].focus();return bad.length===0;}
+form.addEventListener("input",()=>{if(form.dataset.tried)validate(false);});
+form.addEventListener("change",()=>{if(form.dataset.tried)validate(false);});
+function buildMessage(){const v=values(),d=T[lang];
+  const lines=[d.mHead,"",`${d.mDir}: ${d.dirs[v.direction]||""}`,`${d.mLevel}: ${$("level").selectedOptions[0]?.textContent||""}`,`${d.mGoal}: ${v.goal}`,`${d.mMethod}: ${$("method").selectedOptions[0]?.textContent||""}`,`${d.mContact}: ${v.contact}`];
+  if(v.comment)lines.push(`${d.mComment}: ${v.comment}`);msgEl.textContent=lines.join("\n");return v;}
+/* TODO(supabase): BookingAdapter.send currently only has a manual-copy fallback (no endpoint configured).
+   Replace with an `insert` into the `bookings` table via the Supabase client, which also triggers the
+   DB webhook/Edge Function that emails Maria through Resend. See docs/supabase-integration.md. */
+const BookingAdapter={endpoint:null,async send(payload){if(!this.endpoint)return{ok:false,reason:"not_configured"};
+  const r=await fetch(this.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});return{ok:r.ok};}};
+let busy=false;
+form.addEventListener("submit",async e=>{e.preventDefault();if(busy)return;form.dataset.tried="1";if(!validate(true))return;
+  busy=true;const payload=buildMessage();await BookingAdapter.send({...payload,lang});busy=false;
+  form.hidden=true;result.hidden=false;$("copied").textContent="";result.focus({preventScroll:true});result.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});relayout();});
+$("editBtn").addEventListener("click",()=>{result.hidden=true;form.hidden=false;$("submitBtn").focus();relayout();});
+$("copyBtn").addEventListener("click",()=>{const ok=()=>{$("copied").textContent=T[lang].copied;};
+  const fail=()=>{const r=document.createRange();r.selectNodeContents(msgEl);const s=getSelection();s.removeAllRanges();s.addRange(r);$("copied").textContent=T[lang].copyFail;};
+  try{navigator.clipboard.writeText(msgEl.textContent).then(ok,fail);}catch(err){fail();}});
+$("collabLink").addEventListener("click",()=>{const r=$("dir-collab");r.checked=true;r.dispatchEvent(new Event("change",{bubbles:true}));});
+
+/* ---------- static text (both languages are pre-rendered per page; apply() just wires up dynamic parts) ---------- */
+function apply(l){lang=l;const d=T[l];
+  document.querySelectorAll(".lang a,.foot-lang").forEach(b=>b.setAttribute("aria-current",String(b.dataset.lang===l)));
+  $("bandHint").textContent=d[band.getAttribute("aria-expanded")==="true"?"artClose":"artOpen"];
+  vids.forEach(f=>f._sync&&f._sync());
+  acctRefresh();
+  if(form.dataset.tried)validate(false);
+  if(!result.hidden)buildMessage();
+  relayout();}
+
+
+/* ---------- account (prototype): sign-up and sign-in, profile, student area; Maria's panel at #infinitylove.
+   Demo storage: everything lives in this browser only. The production site replaces this store with
+   Supabase Auth + Postgres row-level security + private storage (see the security plan). ---------- */
+const A={
+uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_profile:"Ваші дані та зв'язок з Марією",sub_book:"Вільні дати та ваші заявки",sub_study:"Заняття та історія відвідувань",sub_knowledge:"Матеріали від Марії",sub_reviews:"Кілька слів для Марії",sub_messages:"Пряма переписка з Марією",pData:"Особисті дані",pStatus:"Статус",mailOk:"Пошта закріплена за профілем: Марія відповідатиме на неї.",mailWhy:"Підтвердіть пошту, щоб писати Марії з профілю.",joinNote:"Після реєстрації Марія побачить ваш профіль і відкриє статус учениці.",signIn:"Вхід",signUp:"Реєстрація",createAcc:"Створити акаунт",name:"Ім'я",password:"Пароль",
+  demoNote:"Демо-режим: акаунти й дані зберігаються лише в цьому браузері. Справжні акаунти запрацюють після підключення сервера.",
+  eName:"Вкажіть ім'я.",eEmail:"Перевірте email.",ePass:"Пароль: щонайменше 8 символів.",eTaken:"Цей email уже зареєстровано.",eWrong:"Невірний email або пароль.",
+  student:"Учениця",registered:"Зареєстрована",verified:"Пошту підтверджено",myProfile:"Мій профіль",logout:"Вийти",close:"Закрити",
+  t_profile:"Профіль",t_book:"Запис",t_study:"Навчання",t_knowledge:"Знання",t_reviews:"Відгуки",t_messages:"Повідомлення",
+  changeAv:"Змінити аватар",social:"Instagram або інша соцмережа",socialPh:"@нікнейм або посилання",verifyEmail:"Підтвердити пошту",save:"Зберегти",saved:"Збережено",
+  verifySent:"Демо: пошту підтверджено. На сайті прийде лист із посиланням.",
+  quickBook:"Швидкий запис",quickBookNote:"Оберіть вільну дату. Контакт уже збережено в профілі, Марія підтвердить запис.",direction:"Напрям",comment:"Коментар",
+  bookBtn:"Записатися",ePickSlot:"Оберіть дату.",noSlots:"Марія ще не відкрила вільні дати. Загляньте пізніше або напишіть їй.",myRequests:"Мої заявки",
+  st_new:"очікує",st_confirmed:"підтверджено",st_declined:"відхилено",booked:"Заявку надіслано Марії",
+  studentOnly:"Тільки для учениць",studyLock:"Розділ з'явиться, коли Марія прийме вас ученицею.",knowLock:"Матеріали Марії відкриваються ученицям.",
+  upcoming:"Найближчі заняття",history:"Історія відвідувань",visits:"Відвідано занять: ",noUpcoming:"Поки немає запланованих занять.",noHistory:"Історія з'явиться після першого заняття.",
+  noMaterials:"Марія ще не додала матеріали.",awaitAccess:"доступ відкриє Марія",
+  yourReview:"Ваш відгук для Марії",sendReview:"Надіслати відгук",eEmpty:"Напишіть кілька слів.",rev_pub:"опубліковано",rev_pending:"на модерації",reviewSent:"Відгук надіслано на модерацію",
+  msgVerifyFirst:"Підтвердіть пошту в профілі, і тоді зможете писати Марії без введення email: він закріпиться за вами.",
+  msgPh:"Повідомлення для Марії",send:"Надіслати",msgFrom:"Відповідь прийде на ",you:"Ви",maria:"Марія",msgSent:"Повідомлення надіслано",
+  revsTitle:"Відгуки учениць",
+  adm:"Кабінет Марії",admLogin:"Логін",admPass:"Пароль",adm2fa:"Код 2FA",admEnter:"Увійти",
+  admNote:"Демо-панель. На справжньому сайті вхід перевіряє сервер: пароль і одноразовий код із застосунку-автентифікатора, обмеження спроб. Тут будь-які дані відкривають демо.",
+  a_students:"Учениці",a_training:"Тренування",a_slots:"Вільні дати",a_messages:"Повідомлення",a_reviews:"Відгуки",a_knowledge:"Знання",
+  noUsers:"Поки ніхто не зареєструвався.",makeStudent:"Зробити ученицею",unStudent:"Зняти статус",
+  requests:"Нові заявки",noRequests:"Нових заявок немає.",confirm:"Підтвердити",decline:"Відхилити",assign:"Призначити тренування",who:"Учениця",when:"Дата й час",add:"Додати",remove:"Прибрати",
+  noSessions:"Немає занять.",addSlot:"Відкрити дату",noFree:"Вільних дат немає.",reply:"Відповісти",noMessages:"Повідомлень немає.",
+  approve:"Опублікувати",unpublish:"Сховати",del:"Видалити",noReviews:"Відгуків немає.",
+  matTitle:"Назва",matText:"Текст",matImage:"Фото",addMat:"Додати матеріал",access:"Доступ",noStudents:"Ще немає учениць.",
+  eFill:"Заповніть поля.",done:"Готово"},
+en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and your line to Maria",sub_book:"Free dates and your requests",sub_study:"Sessions and attendance history",sub_knowledge:"Materials from Maria",sub_reviews:"A few words for Maria",sub_messages:"Direct messages with Maria",pData:"Personal details",pStatus:"Status",mailOk:"Your email is attached to the profile: Maria replies to it.",mailWhy:"Confirm your email to message Maria from your profile.",joinNote:"After you sign up, Maria sees your profile and grants you student status.",signIn:"Sign in",signUp:"Sign up",createAcc:"Create account",name:"Name",password:"Password",
+  demoNote:"Demo mode: accounts and data are stored only in this browser. Real accounts will work once the server is connected.",
+  eName:"Enter your name.",eEmail:"Check the email.",ePass:"Password: at least 8 characters.",eTaken:"This email is already registered.",eWrong:"Wrong email or password.",
+  student:"Student",registered:"Registered",verified:"Email confirmed",myProfile:"My profile",logout:"Sign out",close:"Close",
+  t_profile:"Profile",t_book:"Booking",t_study:"Training",t_knowledge:"Knowledge",t_reviews:"Reviews",t_messages:"Messages",
+  changeAv:"Change avatar",social:"Instagram or another social network",socialPh:"@handle or link",verifyEmail:"Confirm email",save:"Save",saved:"Saved",
+  verifySent:"Demo: email confirmed. On the live site a link arrives by email.",
+  quickBook:"Quick booking",quickBookNote:"Pick a free date. Your contact is already in your profile; Maria will confirm.",direction:"Direction",comment:"Comment",
+  bookBtn:"Book",ePickSlot:"Pick a date.",noSlots:"Maria hasn't opened free dates yet. Check back later or message her.",myRequests:"My requests",
+  st_new:"pending",st_confirmed:"confirmed",st_declined:"declined",booked:"Request sent to Maria",
+  studentOnly:"Students only",studyLock:"This section appears once Maria accepts you as her student.",knowLock:"Maria's materials open to her students.",
+  upcoming:"Upcoming sessions",history:"Attendance history",visits:"Sessions attended: ",noUpcoming:"No sessions scheduled yet.",noHistory:"History appears after your first session.",
+  noMaterials:"Maria hasn't added materials yet.",awaitAccess:"Maria will open access",
+  yourReview:"Your review for Maria",sendReview:"Send review",eEmpty:"Write a few words.",rev_pub:"published",rev_pending:"in moderation",reviewSent:"Review sent for moderation",
+  msgVerifyFirst:"Confirm your email in the profile, then you can message Maria without typing it: it stays attached to you.",
+  msgPh:"Message to Maria",send:"Send",msgFrom:"Replies go to ",you:"You",maria:"Maria",msgSent:"Message sent",
+  revsTitle:"Students' reviews",
+  adm:"Maria's panel",admLogin:"Login",admPass:"Password",adm2fa:"2FA code",admEnter:"Sign in",
+  admNote:"Demo panel. On the live site the server checks the login: password plus a one-time code from an authenticator app, with attempt limits. Here any input opens the demo.",
+  a_students:"Students",a_training:"Training",a_slots:"Free dates",a_messages:"Messages",a_reviews:"Reviews",a_knowledge:"Knowledge",
+  noUsers:"Nobody has signed up yet.",makeStudent:"Make student",unStudent:"Remove status",
+  requests:"New requests",noRequests:"No new requests.",confirm:"Confirm",decline:"Decline",assign:"Assign a session",who:"Student",when:"Date and time",add:"Add",remove:"Remove",
+  noSessions:"No sessions.",addSlot:"Open a date",noFree:"No free dates.",reply:"Reply",noMessages:"No messages.",
+  approve:"Publish",unpublish:"Hide",del:"Delete",noReviews:"No reviews.",
+  matTitle:"Title",matText:"Text",matImage:"Photo",addMat:"Add material",access:"Access",noStudents:"No students yet.",
+  eFill:"Fill in the fields.",done:"Done"}};
+const a=k=>A[lang][k]??k;
+/* TODO(supabase): this whole demo store (DKEY, blank(), db, persist()) is a stand-in for Supabase.
+   Replace with: Supabase Auth (sign up/in, email confirmation, MFA for admin) for `users`/session,
+   and Postgres tables (slots, bookings, lessons, messages, reviews, materials) behind RLS for everything
+   below. Nothing here should ship to production as-is. */
+const DKEY="mb-demo-v1";
+const blank=()=>({users:[],session:null,slots:[],sessions:[],requests:[],messages:[],reviews:[],materials:[]});
+let db=blank();
+try{const raw=localStorage.getItem(DKEY);if(raw)db=Object.assign(blank(),JSON.parse(raw));}catch(e){}
+const persist=()=>{try{localStorage.setItem(DKEY,JSON.stringify(db));}catch(e){toast("Storage is full or blocked");}};
+const nid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const me=()=>db.users.find(u=>u.id===db.session)||null;
+const userById=id=>db.users.find(u=>u.id===id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function pwHash(email,p){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("mb|"+email+"|"+p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}catch(e){return "x"+btoa(unescape(encodeURIComponent(email+p)));}}
+const fmt=iso=>new Date(iso).toLocaleString(lang==="uk"?"uk-UA":"en-GB",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
+const future=iso=>new Date(iso).getTime()>Date.now();
+const dirName=k=>T[lang].dirs[k]||k;
+const dirOptions=()=>Object.keys(T[lang].dirs).map(k=>`<option value="${k}">${esc(dirName(k))}</option>`).join("");
+const ICON_USER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.2-5.2 7.5-5.2s6.1 1.6 7.5 5.2"/></svg>';
+const ICON_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/></svg>';
+const avHTML=(u,cls="")=>`<span class="av ${cls}">${u&&u.avatar?`<img src="${u.avatar}" alt="" draggable="false">`:u?esc(((u.name||"?").trim()[0]||"?").toUpperCase()):ICON_USER}</span>`;
+const statusPill=u=>u.student?`<span class="pill red">${a("student")}</span>`:`<span class="pill">${a("registered")}</span>`;
+const lockHTML=(t,h)=>`<div class="lock">${ICON_LOCK}<strong>${esc(t)}</strong><span class="note">${esc(h)}</span></div>`;
+const emptyNote=t=>`<p class="note">${esc(t)}</p>`;
+function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;t.classList.remove("show");void t.offsetWidth;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>{t.hidden=true;},2600);}
+/* TODO(supabase): avatar/material images are read as base64 data URLs into localStorage here.
+   Replace with an upload to a private Supabase Storage bucket and store the resulting path; render
+   with a short-lived signed URL instead of a data URL. */
+function readImg(file,max){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{
+  const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.85));};im.src=fr.result;};fr.readAsDataURL(file);});}
+const dlgOpen=d=>{if(!d.open){d.classList.remove("closing");document.documentElement.classList.add("modal-open");if(d.showModal)d.showModal();else d.setAttribute("open","");}};
+function softClose(d){if(!d.open||d.classList.contains("closing"))return;if(reduce){d.close();return;}
+  d.classList.add("closing");setTimeout(()=>{d.classList.remove("closing");d.close();},440);}
+document.querySelectorAll("dialog.dlg").forEach(d=>{d.addEventListener("cancel",e=>{e.preventDefault();softClose(d);});
+  d.addEventListener("close",()=>{if(![...document.querySelectorAll("dialog.dlg")].some(x=>x.open))document.documentElement.classList.remove("modal-open");});});
+
+/* ----- nav avatar and the small centred card ----- */
+const acct=$("acct"),prof=$("prof"),adm=$("adm"),avBtn=$("avatarBtn");
+let authTab="in",profTab="profile",admTab="students",admOk=false;
+function renderNav(){const u=me();avBtn.innerHTML=avHTML(u);avBtn.classList.toggle("on",!!u);avBtn.setAttribute("aria-label",u?`${a("acct")}: ${u.name}`:a("acct"));}
+function renderAcct(){const u=me(),v=$("acctBody");
+  if(!u){v.innerHTML=`<p class="mono eyebrow">${a("acctEyebrow")}</p><h3 id="acctTitle">${authTab==="in"?a("signIn"):a("signUp")}</h3>
+    <div class="seg2" role="group"><button type="button" data-a="tab-in" aria-pressed="${authTab==="in"}">${a("signIn")}</button><button type="button" data-a="tab-up" aria-pressed="${authTab==="up"}">${a("signUp")}</button></div>
+    <form id="authForm" novalidate>
+      ${authTab==="up"?`<div class="field"><label class="lbl" for="au-name">${a("name")}</label><input type="text" id="au-name" autocomplete="name" maxlength="60"></div>`:""}
+      <div class="field"><label class="lbl" for="au-email">Email</label><input type="email" id="au-email" autocomplete="email" maxlength="120"></div>
+      <div class="field"><label class="lbl" for="au-pass">${a("password")}</label><input type="password" id="au-pass" autocomplete="${authTab==="up"?"new-password":"current-password"}" maxlength="128"></div>
+      <div class="err" id="au-err" role="alert"></div>
+      <button class="glass" type="submit">${authTab==="in"?a("signIn"):a("createAcc")}<span class="arr">→</span></button>
+    </form>${joinIntent&&authTab==="up"?`<p class="note join-note">${a("joinNote")}</p>`:""}<p class="note">${a("demoNote")}</p>`;return;}
+  v.innerHTML=`<p class="mono eyebrow">${a("acctEyebrow")}</p><div class="mini-prof">${avHTML(u,"lg")}<div class="mp-txt"><h3 id="acctTitle">${esc(u.name)}</h3><div class="row">${statusPill(u)}${u.verified?`<span class="pill">${a("verified")}</span>`:""}</div><p class="note">${esc(u.email)}</p></div></div>
+    <div class="row" style="margin-top:22px"><button class="glass" type="button" data-a="open-prof">${a("myProfile")}<span class="arr">→</span></button><button class="txt-btn" type="button" data-a="logout">${a("logout")}</button></div>`;}
+avBtn.addEventListener("click",()=>{joinIntent=false;renderAcct();dlgOpen(acct);});
+/* "become a student" in the booking form: registration first; Maria grants the status afterwards */
+let joinIntent=false;
+$("joinBtn").addEventListener("click",()=>{if(me()){profTab="profile";renderProf();dlgOpen(prof);return;}authTab="up";joinIntent=true;renderAcct();dlgOpen(acct);});
+$("joinQ").addEventListener("click",()=>{const box=$("joinInfo"),o=box.hidden;box.hidden=!o;$("joinQ").setAttribute("aria-expanded",String(o));});
+
+/* ----- my profile ----- */
+const PTABS=["profile","book","study","knowledge","reviews","messages"];
+const PICON={
+  profile:'<path d="M12 12.2a3.8 3.8 0 100-7.6 3.8 3.8 0 000 7.6zM4.8 20c1.3-3.4 4-5 7.2-5s5.9 1.6 7.2 5"/>',
+  book:'<rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+  study:'<path d="M4 18.5h16M6.5 15l3.5-4 3 2.5 4.5-6"/>',
+  knowledge:'<path d="M5 5.5c2.5-1 5-1 7 .5 2-1.5 4.5-1.5 7-.5v13c-2.5-1-5-1-7 .5-2-1.5-4.5-1.5-7-.5z"/><path d="M12 6v13"/>',
+  reviews:'<path d="M12 4.5l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z"/>',
+  messages:'<path d="M5 6.5h14v9H10l-4 3v-3H5z"/>'};
+const picon=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${PICON[k]}</svg>`;
+function renderProf(){const u=me();if(!u){prof.close();return;}
+  const locked=k=>(k==="study"||k==="knowledge")&&!u.student;
+  $("profSide").innerHTML=`<div class="side-id">
+      <div class="av-wrap">${avHTML(u,"xl")}<label class="av-cam" for="avFile" title="${a("changeAv")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4.5 8.5h3l1.5-2h6l1.5 2h3v10h-15z"/><circle cx="12" cy="13" r="3.2"/></svg><span class="sr">${a("changeAv")}</span></label><input type="file" id="avFile" accept="image/*" hidden></div>
+      <div class="side-txt"><h3>${esc(u.name)}</h3>${statusPill(u)}<span class="side-mail">${esc(u.email)}${u.verified?' <span class="ok" title="'+a("verified")+'">✓</span>':""}</span></div>
+    </div>
+    <nav class="vtabs" role="tablist" aria-label="${a("myProfile")}">${PTABS.map(k=>`<button type="button" role="tab" data-a="ptab" data-k="${k}" aria-selected="${profTab===k}">${picon(k)}<span>${a("t_"+k)}</span>${locked(k)?`<i class="lk">${ICON_LOCK}</i>`:""}</button>`).join("")}</nav>
+    <button type="button" class="txt-btn side-out" data-a="logout">${a("logout")}</button>`;
+  $("profTitle").innerHTML=`<p class="mono eyebrow">${a("myProfile")}</p><h3>${a("t_"+profTab)}</h3><p class="note">${a("sub_"+profTab)}</p>`;
+  const html=PANE[profTab](u);
+  $("profPane").innerHTML=(profTab==="profile"||profTab==="knowledge"||html.startsWith('<div class="lock"'))?html:`<div class="pcard">${html}</div>`;}
+const PANE={
+profile:u=>`<div class="pcards">
+  <form id="profForm" class="pcard" novalidate><h4>${a("pData")}</h4>
+    <div class="row2"><div class="field"><label class="lbl" for="pf-name">${a("name")}</label><input type="text" id="pf-name" maxlength="60" value="${esc(u.name)}"></div>
+    <div class="field"><label class="lbl" for="pf-social">${a("social")}</label><input type="text" id="pf-social" maxlength="120" placeholder="${a("socialPh")}" value="${esc(u.social)}"></div></div>
+    <div class="pc-foot"><button class="glass sm" type="submit">${a("save")}</button></div></form>
+  <div class="pcard"><h4>Email</h4><div class="pc-row"><span class="pc-val">${esc(u.email)}</span>${u.verified?`<span class="pill">${a("verified")}</span>`:`<button type="button" class="glass sm" data-a="verify">${a("verifyEmail")}</button>`}</div>
+    <p class="note">${u.verified?a("mailOk"):a("mailWhy")}</p></div>
+  <div class="pcard ${u.student?"is-student":""}"><h4>${a("pStatus")}</h4><div class="pc-row">${statusPill(u)}<span class="note">${u.student?a("visits")+db.sessions.filter(s=>s.userId===u.id&&!future(s.date)).length:a("joinNote")}</span></div></div>
+</div>`,
+book:u=>{const free=db.slots.filter(s=>future(s.date)&&!db.requests.some(r=>r.slotId===s.id&&r.status!=="declined")).sort((x,y)=>x.date.localeCompare(y.date));
+  const mine=db.requests.filter(r=>r.userId===u.id).sort((x,y)=>y.created.localeCompare(x.created));
+  return `<h4>${a("quickBook")}</h4><p class="note">${a("quickBookNote")}</p>
+  ${free.length?`<form id="qbForm" novalidate><div class="slots" role="radiogroup">${free.map(s=>`<label class="slot"><input type="radio" name="slot" value="${s.id}"><span class="glass sm">${esc(fmt(s.date))}</span></label>`).join("")}</div>
+    <div class="row2"><div class="field"><label class="lbl" for="qbDir">${a("direction")}</label><select id="qbDir">${dirOptions()}</select></div>
+    <div class="field"><label class="lbl" for="qbNote">${a("comment")}</label><input type="text" id="qbNote" maxlength="300"></div></div>
+    <div class="err" id="qbErr" role="alert"></div><button class="glass" type="submit">${a("bookBtn")}<span class="arr">→</span></button></form>`:`<p class="note pc-empty">${a("noSlots")}</p>`}
+  ${mine.length?`<h4>${a("myRequests")}</h4><ul class="list">${mine.map(r=>{const s=db.slots.find(x=>x.id===r.slotId);return `<li class="item"><span>${s?esc(fmt(s.date)):"—"} · ${esc(dirName(r.dir))}</span><span class="pill ${r.status==="confirmed"?"red":""}">${a("st_"+r.status)}</span></li>`;}).join("")}</ul>`:""}`;},
+study:u=>{if(!u.student)return lockHTML(a("studentOnly"),a("studyLock"));
+  const mine=db.sessions.filter(s=>s.userId===u.id),up=mine.filter(s=>future(s.date)).sort((x,y)=>x.date.localeCompare(y.date)),past=mine.filter(s=>!future(s.date)).sort((x,y)=>y.date.localeCompare(x.date));
+  const li=s=>`<li class="item"><span>${esc(fmt(s.date))}</span><span class="pill">${esc(dirName(s.dir))}</span></li>`;
+  return `<h3>${a("upcoming")}</h3>${up.length?`<ul class="list">${up.map(li).join("")}</ul>`:emptyNote(a("noUpcoming"))}
+  <h3 style="margin-top:28px">${a("history")}</h3><p class="note">${a("visits")}${past.length}</p>${past.length?`<ul class="list">${past.map(li).join("")}</ul>`:emptyNote(a("noHistory"))}`;},
+knowledge:u=>{if(!u.student)return lockHTML(a("studentOnly"),a("knowLock"));
+  if(!db.materials.length)return emptyNote(a("noMaterials"));
+  return `<div class="mats">${db.materials.map(m=>m.granted.includes(u.id)?`<article class="mat"><h4>${esc(m.title)}</h4>${m.image?`<div class="mat-media protect"><img src="${m.image}" alt="" draggable="false"><span class="wm">${esc(u.name)} · Maria Blade</span></div>`:""}<p>${esc(m.text).replace(/\n/g,"<br>")}</p></article>`
+    :`<div class="item locked">${ICON_LOCK}<span>${esc(m.title)}</span><span class="pill">${a("awaitAccess")}</span></div>`).join("")}</div>`;},
+reviews:u=>{const mine=db.reviews.filter(r=>r.userId===u.id).sort((x,y)=>y.date.localeCompare(x.date));
+  return `<form id="revForm" novalidate><div class="field"><label class="lbl" for="revText">${a("yourReview")}</label><textarea id="revText" rows="3" maxlength="800"></textarea></div>
+  <div class="err" id="revErr" role="alert"></div><button class="glass" type="submit">${a("sendReview")}</button></form>
+  ${mine.length?`<ul class="list" style="margin-top:22px">${mine.map(r=>`<li class="item"><span class="rv">${esc(r.text)}</span><span class="pill ${r.approved?"red":""}">${a(r.approved?"rev_pub":"rev_pending")}</span></li>`).join("")}</ul>`:""}`;},
+messages:u=>{const th=db.messages.filter(m=>m.userId===u.id).sort((x,y)=>x.date.localeCompare(y.date));
+  const thread=th.length?`<div class="thread">${th.map(m=>`<div class="bub ${m.fromAdmin?"her":"mine"}"><span class="mono">${m.fromAdmin?a("maria"):a("you")} · ${esc(fmt(m.date))}</span><p>${esc(m.text)}</p></div>`).join("")}</div>`:"";
+  if(!u.verified)return `<div class="lock">${ICON_LOCK}<span class="note">${a("msgVerifyFirst")}</span><button type="button" class="glass sm" data-a="verify">${a("verifyEmail")}</button></div>${thread}`;
+  return `${thread}<form id="msgForm" novalidate><div class="field"><label class="lbl" for="msgText">${a("msgPh")}</label><textarea id="msgText" rows="3" maxlength="1500"></textarea></div>
+  <p class="note">${a("msgFrom")}${esc(u.email)}</p><div class="err" id="msgErr" role="alert"></div><button class="glass" type="submit">${a("send")}<span class="arr">→</span></button></form>`;}
+};
+
+/* ----- Maria's panel ----- */
+const ATABS=["students","training","slots","messages","reviews","knowledge"];
+function renderAdm(){
+  if(!admOk){$("admHead").innerHTML=`<div><p class="mono eyebrow">mariablade.com/infinitylove</p><h3>${a("adm")}</h3></div>`;$("admTabs").innerHTML="";
+    $("admPane").innerHTML=`<form id="admLogin" class="adm-login" novalidate>
+      <div class="field"><label class="lbl" for="ad-l">${a("admLogin")}</label><input type="text" id="ad-l" autocomplete="username" maxlength="80"></div>
+      <div class="field"><label class="lbl" for="ad-p">${a("admPass")}</label><input type="password" id="ad-p" autocomplete="current-password" maxlength="128"></div>
+      <div class="field"><label class="lbl" for="ad-c">${a("adm2fa")}</label><input type="text" id="ad-c" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+      <button class="glass" type="submit">${a("admEnter")}<span class="arr">→</span></button><p class="note">${a("admNote")}</p></form>`;return;}
+  const n=db.requests.filter(r=>r.status==="new").length;
+  $("admHead").innerHTML=`<div><p class="mono eyebrow">mariablade.com/infinitylove</p><h3>${a("adm")}</h3></div>`;
+  $("admTabs").innerHTML=ATABS.map(k=>`<button type="button" role="tab" data-a="atab" data-k="${k}" aria-selected="${admTab===k}">${a("a_"+k)}${k==="training"&&n?` <span class="badge">${n}</span>`:""}</button>`).join("");
+  $("admPane").innerHTML=APANE[admTab]();}
+const userOpts=()=>db.users.map(u=>`<option value="${u.id}">${esc(u.name)}${u.student?" ★":""}</option>`).join("");
+const APANE={
+students:()=>db.users.length?`<ul class="list">${db.users.map(u=>{const v=db.sessions.filter(s=>s.userId===u.id&&!future(s.date)).length;
+  return `<li class="item"><div class="row">${avHTML(u,"sm")}<div><strong>${esc(u.name)}</strong><div class="note">${esc(u.email)}${u.verified?" ✓":""}${u.social?` · ${esc(u.social)}`:""} · ${a("visits")}${v}</div></div></div>
+  <div class="row">${statusPill(u)}<button type="button" class="glass sm" data-a="toggle-student" data-id="${u.id}">${u.student?a("unStudent"):a("makeStudent")}</button></div></li>`;}).join("")}</ul>`:emptyNote(a("noUsers")),
+training:()=>{const req=db.requests.filter(r=>r.status==="new"),up=db.sessions.filter(s=>future(s.date)).sort((x,y)=>x.date.localeCompare(y.date)),past=db.sessions.filter(s=>!future(s.date)).sort((x,y)=>y.date.localeCompare(x.date));
+  const sli=s=>{const u=userById(s.userId);return `<li class="item"><span>${esc(fmt(s.date))} · ${esc(u?u.name:"—")} · ${esc(dirName(s.dir))}</span><button type="button" class="txt-btn" data-a="del-session" data-id="${s.id}">${a("remove")}</button></li>`;};
+  return `<h4>${a("requests")}</h4>${req.length?`<ul class="list">${req.map(r=>{const u=userById(r.userId),s=db.slots.find(x=>x.id===r.slotId);return `<li class="item"><span>${esc(u?u.name:"—")} · ${s?esc(fmt(s.date)):"—"} · ${esc(dirName(r.dir))}${r.note?` · «${esc(r.note)}»`:""}</span>
+    <span class="row"><button type="button" class="glass sm" data-a="req-ok" data-id="${r.id}">${a("confirm")}</button><button type="button" class="txt-btn" data-a="req-no" data-id="${r.id}">${a("decline")}</button></span></li>`;}).join("")}</ul>`:emptyNote(a("noRequests"))}
+  <h4>${a("assign")}</h4>${db.users.length?`<form id="assignForm" class="inline-form" novalidate><div class="field"><label class="lbl" for="as-u">${a("who")}</label><select id="as-u">${userOpts()}</select></div>
+    <div class="field"><label class="lbl" for="as-d">${a("when")}</label><input type="datetime-local" id="as-d"></div><div class="field"><label class="lbl" for="as-k">${a("direction")}</label><select id="as-k">${dirOptions()}</select></div>
+    <button class="glass sm" type="submit">${a("add")}</button></form>`:emptyNote(a("noUsers"))}
+  <h4>${a("upcoming")}</h4>${up.length?`<ul class="list">${up.map(sli).join("")}</ul>`:emptyNote(a("noSessions"))}
+  <h4>${a("history")}</h4>${past.length?`<ul class="list">${past.map(sli).join("")}</ul>`:emptyNote(a("noSessions"))}`;},
+slots:()=>{const fr=db.slots.filter(s=>future(s.date)).sort((x,y)=>x.date.localeCompare(y.date));
+  return `<form id="slotForm" class="inline-form" novalidate><div class="field"><label class="lbl" for="sl-d">${a("when")}</label><input type="datetime-local" id="sl-d"></div><button class="glass sm" type="submit">${a("addSlot")}</button></form>
+  ${fr.length?`<ul class="list" style="margin-top:18px">${fr.map(s=>`<li class="item"><span>${esc(fmt(s.date))}</span><button type="button" class="txt-btn" data-a="del-slot" data-id="${s.id}">${a("remove")}</button></li>`).join("")}</ul>`:emptyNote(a("noFree"))}`;},
+messages:()=>{const ids=[...new Set(db.messages.map(m=>m.userId))];if(!ids.length)return emptyNote(a("noMessages"));
+  return ids.map(id=>{const u=userById(id),th=db.messages.filter(m=>m.userId===id).sort((x,y)=>x.date.localeCompare(y.date));
+    return `<section class="adm-thread"><div class="row">${avHTML(u,"sm")}<strong>${esc(u?u.name:"—")}</strong><span class="note">${esc(u?u.email:"")}</span></div>
+    <div class="thread">${th.map(m=>`<div class="bub ${m.fromAdmin?"mine":"her"}"><span class="mono">${m.fromAdmin?a("maria"):esc(u?u.name:"")} · ${esc(fmt(m.date))}</span><p>${esc(m.text)}</p></div>`).join("")}</div>
+    <form class="replyForm inline-form" data-id="${id}" novalidate><div class="field" style="flex:1"><label class="lbl" for="rp-${id}">${a("reply")}</label><input type="text" id="rp-${id}" maxlength="1500"></div><button class="glass sm" type="submit">${a("send")}</button></form></section>`;}).join("");},
+reviews:()=>db.reviews.length?`<ul class="list">${db.reviews.map(r=>{const u=userById(r.userId);return `<li class="item"><span class="rv"><strong>${esc(u?u.name:"—")}</strong> — ${esc(r.text)}</span>
+  <span class="row"><button type="button" class="glass sm" data-a="rev-toggle" data-id="${r.id}">${r.approved?a("unpublish"):a("approve")}</button><button type="button" class="txt-btn" data-a="rev-del" data-id="${r.id}">${a("del")}</button></span></li>`;}).join("")}</ul>`:emptyNote(a("noReviews")),
+knowledge:()=>{const st=db.users.filter(u=>u.student);
+  return `<form id="matForm" novalidate><div class="field"><label class="lbl" for="mt-t">${a("matTitle")}</label><input type="text" id="mt-t" maxlength="120"></div>
+  <div class="field"><label class="lbl" for="mt-x">${a("matText")}</label><textarea id="mt-x" rows="3" maxlength="4000"></textarea></div>
+  <div class="field"><label class="lbl" for="mt-i">${a("matImage")}</label><input type="file" id="mt-i" accept="image/*"></div>
+  <div class="err" id="mtErr" role="alert"></div><button class="glass sm" type="submit">${a("addMat")}</button></form>
+  <ul class="list" style="margin-top:22px">${db.materials.map(m=>`<li class="item col"><div class="row" style="justify-content:space-between;width:100%"><strong>${esc(m.title)}</strong><button type="button" class="txt-btn" data-a="mat-del" data-id="${m.id}">${a("del")}</button></div>
+    <div class="row"><span class="mono note">${a("access")}:</span>${st.length?st.map(u=>`<label class="chk"><input type="checkbox" data-a="grant" data-m="${m.id}" data-u="${u.id}" ${m.granted.includes(u.id)?"checked":""}><span>${esc(u.name)}</span></label>`).join(""):`<span class="note">${a("noStudents")}</span>`}</div></li>`).join("")}</ul>`;}
+};
+
+/* ----- public reviews (only those Maria published) ----- */
+function renderPubRevs(){const box=$("pubRevs"),list=db.reviews.filter(r=>r.approved);box.hidden=!list.length;
+  box.innerHTML=list.length?`<span class="mono">${a("revsTitle")}</span>${list.slice(-4).reverse().map(r=>{const u=userById(r.userId);return `<figure class="rev">${avHTML(u,"sm")}<figcaption><p>${esc(r.text)}</p><span class="mono">${esc(u?u.name:"")}</span></figcaption></figure>`;}).join("")}`:"";}
+
+function acctRefresh(){renderNav();renderPubRevs();if(acct.open)renderAcct();if(prof.open)renderProf();if(adm.open)renderAdm();}
+const commit=()=>{persist();acctRefresh();};
+
+/* ----- clicks ----- */
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");
+  if(e.target.matches("dialog.dlg"))softClose(e.target);
+  if(!b)return;const act=b.dataset.a,id=b.dataset.id,u=me();
+  switch(act){
+    case"close":softClose(b.closest("dialog"));break;
+    case"tab-in":authTab="in";renderAcct();break;
+    case"tab-up":authTab="up";renderAcct();break;
+    case"logout":db.session=null;commit();softClose(acct);break;
+    case"open-prof":acct.close();profTab="profile";renderProf();dlgOpen(prof);break;
+    case"ptab":profTab=b.dataset.k;renderProf();break;
+    /* TODO(supabase): replace with the real email-confirmation flow (Supabase sends the link). */
+    case"verify":if(u){u.verified=true;commit();toast(a("verifySent"));}break;
+    case"atab":admTab=b.dataset.k;renderAdm();break;
+    /* TODO(supabase): update the `profiles.student` flag via an admin-only RLS policy / RPC. */
+    case"toggle-student":{const x=userById(id);if(x){x.student=!x.student;commit();}break;}
+    /* TODO(supabase): update `bookings.status` and insert into `lessons` server-side (RPC), not client-side. */
+    case"req-ok":{const r=db.requests.find(x=>x.id===id),s=r&&db.slots.find(x=>x.id===r.slotId);if(r&&s){r.status="confirmed";db.sessions.push({id:nid(),userId:r.userId,date:s.date,dir:r.dir});commit();}break;}
+    case"req-no":{const r=db.requests.find(x=>x.id===id);if(r){r.status="declined";commit();}break;}
+    /* TODO(supabase): delete from `lessons`/`slots` via RLS-guarded admin policy. */
+    case"del-session":db.sessions=db.sessions.filter(s=>s.id!==id);commit();break;
+    case"del-slot":db.slots=db.slots.filter(s=>s.id!==id);commit();break;
+    /* TODO(supabase): toggle `reviews.approved` (moderation) — admin only, via RLS/RPC. */
+    case"rev-toggle":{const r=db.reviews.find(x=>x.id===id);if(r){r.approved=!r.approved;commit();}break;}
+    case"rev-del":db.reviews=db.reviews.filter(r=>r.id!==id);commit();break;
+    case"mat-del":db.materials=db.materials.filter(m=>m.id!==id);commit();break;
+  }});
+document.addEventListener("change",async e=>{const t=e.target;
+  if(t.id==="avFile"&&t.files[0]){const u=me();if(!u)return;try{u.avatar=await readImg(t.files[0],320);commit();toast(a("saved"));}catch(err){}}
+  /* TODO(supabase): persist material access grants in a `material_access` join table, admin-only write. */
+  if(t.dataset&&t.dataset.a==="grant"){const m=db.materials.find(x=>x.id===t.dataset.m);if(m){m.granted=t.checked?[...new Set([...m.granted,t.dataset.u])]:m.granted.filter(x=>x!==t.dataset.u);persist();}}});
+
+/* ----- forms ----- */
+const val=id=>($(id)?.value||"").trim();
+const setE=(id,k)=>{const el=$(id);if(el)el.textContent=k?a(k):"";return !k;};
+document.addEventListener("submit",async e=>{const f=e.target;if(!f.closest("dialog.dlg"))return;e.preventDefault();const u=me();
+  /* TODO(supabase): replace with supabase.auth.signUp / signInWithPassword. Email confirmation becomes
+     a real emailed link (Supabase Auth), not an in-browser flag. */
+  if(f.id==="authForm"){const email=val("au-email").toLowerCase(),pass=$("au-pass").value;
+    if(authTab==="up"){const name=val("au-name");
+      if(!name)return setE("au-err","eName");if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return setE("au-err","eEmail");if(pass.length<8)return setE("au-err","ePass");
+      if(db.users.some(x=>x.email===email))return setE("au-err","eTaken");
+      const nu={id:nid(),name,email,pw:await pwHash(email,pass),avatar:"",social:"",verified:false,student:false,created:new Date().toISOString()};
+      db.users.push(nu);db.session=nu.id;commit();}
+    else{const x=db.users.find(y=>y.email===email);if(!x||x.pw!==await pwHash(email,pass))return setE("au-err","eWrong");db.session=x.id;commit();}
+    return;}
+  /* TODO(supabase): update the `profiles` row for the signed-in user (RLS: a user may only update their own row). */
+  if(f.id==="profForm"&&u){const name=val("pf-name");if(name)u.name=name;u.social=val("pf-social");commit();toast(a("saved"));return;}
+  /* TODO(supabase): insert into `bookings` (status "new") referencing the chosen `slots` row. */
+  if(f.id==="qbForm"&&u){const s=f.querySelector("input[name=slot]:checked");if(!s)return setE("qbErr","ePickSlot");
+    db.requests.push({id:nid(),userId:u.id,slotId:s.value,dir:$("qbDir").value,note:val("qbNote"),status:"new",created:new Date().toISOString()});commit();toast(a("booked"));return;}
+  /* TODO(supabase): insert into `reviews` (approved=false) — moderation queue lives in Postgres, not localStorage. */
+  if(f.id==="revForm"&&u){const t=val("revText");if(t.length<3)return setE("revErr","eEmpty");db.reviews.push({id:nid(),userId:u.id,text:t,date:new Date().toISOString(),approved:false});commit();toast(a("reviewSent"));return;}
+  /* TODO(supabase): insert into `messages` (RLS: a user may insert/read only their own thread with admin). */
+  if(f.id==="msgForm"&&u&&u.verified){const t=val("msgText");if(t.length<2)return setE("msgErr","eEmpty");db.messages.push({id:nid(),userId:u.id,text:t,date:new Date().toISOString(),fromAdmin:false});commit();toast(a("msgSent"));return;}
+  /* TODO(supabase): replace entirely with supabase.auth.signInWithPassword for the admin account + TOTP
+     MFA challenge (aal2). This demo form currently accepts any input. */
+  if(f.id==="admLogin"){admOk=true;renderAdm();return;}
+  if(!admOk)return;
+  /* TODO(supabase): insert into `lessons` (admin-only RLS policy / RPC). */
+  if(f.id==="assignForm"){const d=val("as-d");if(!d)return toast(a("eFill"));db.sessions.push({id:nid(),userId:$("as-u").value,date:new Date(d).toISOString(),dir:$("as-k").value});commit();toast(a("done"));return;}
+  /* TODO(supabase): insert into `slots` (admin-only RLS policy / RPC). */
+  if(f.id==="slotForm"){const d=val("sl-d");if(!d)return toast(a("eFill"));db.slots.push({id:nid(),date:new Date(d).toISOString()});commit();return;}
+  /* TODO(supabase): insert into `messages` with fromAdmin=true (admin-only RLS policy). */
+  if(f.classList.contains("replyForm")){const inp=f.querySelector("input"),t=inp.value.trim();if(!t)return;db.messages.push({id:nid(),userId:f.dataset.id,text:t,date:new Date().toISOString(),fromAdmin:true});commit();return;}
+  /* TODO(supabase): upload the image to Storage, insert into `materials` (admin-only RLS policy). */
+  if(f.id==="matForm"){const t=val("mt-t"),x=val("mt-x"),file=$("mt-i").files[0];if(!t||(!x&&!file))return setE("mtErr","eFill");
+    let img="";if(file){try{img=await readImg(file,1200);}catch(err){}}db.materials.push({id:nid(),title:t,text:x,image:img,granted:[]});commit();return;}
+});
+
+/* ----- Maria's entrance: mariablade.com/infinitylove ----- */
+function admRoute(){if(location.pathname.replace(/\/$/,"").endsWith("/infinitylove")||location.hash==="#infinitylove"){renderAdm();dlgOpen(adm);}}
+addEventListener("hashchange",admRoute);
+adm.addEventListener("close",()=>{admOk=false;if(location.hash==="#infinitylove"){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}});
+
+/* ----- media: no right-click save, no dragging, no iOS long-press save; materials carry a name watermark ----- */
+document.addEventListener("contextmenu",e=>{if(e.target.closest("img,video,.frame,.polaroid,.portrait,.thumb,.band,.lb,.protect"))e.preventDefault();});
+document.addEventListener("dragstart",e=>{if(e.target.closest("img,video"))e.preventDefault();});
+
+renderNav();renderPubRevs();
+
+apply(lang);glSize();setStops();tone();bgUpdate();admRoute();
+
+/* ---------- loader: wait for fonts and the jungle image (at least the writing time, at most 4.5 s) ---------- */
+(function(){const d=document.documentElement;
+  const done=()=>{if(!d.classList.contains("js-loading"))return;d.classList.remove("js-loading");d.classList.add("loaded");relayout();};
+  const minT=new Promise(r=>setTimeout(r,reduce?250:2100));
+  const fontsP=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
+  const imgP=new Promise(r=>{if(real.complete)r();else{real.addEventListener("load",r);real.addEventListener("error",r);}});
+  Promise.race([Promise.all([minT,fontsP,imgP]),new Promise(r=>setTimeout(r,4500))]).then(()=>requestAnimationFrame(done));
+})();
+})();
