@@ -41,7 +41,6 @@ matEyebrow:"Матеріали",matTitle:"Рух <em>у кадрі</em>",gr1:"Х
 gr3:"Поїздки",gr3d:"Освітні поїздки та навчання.",phVideo:"Відео",phPhoto:"Фото",
 vid1Cap:"Хореографія · @yaroslaava",vid1Label:"Марія танцює в партері на темній сцені з червоним світлом",vid2Label:"Марія танцює High Heels у залі з арковими вікнами",
 vPlay:"Відтворити",vPause:"Пауза",vSoundOn:"Увімкнути звук",vSoundOff:"Вимкнути звук",
-artLabel:"Мистецтво · CHERNAMARS · MADDER",artTitle:"Світ, у якому рух ставав мистецтвом",artOpen:"Відкрити історію",artClose:"Згорнути",chPhotos:"Фото з проєктів",chAlt1:"Марія на колінах на червоному тлі, тіло вкрите чорно-червоним гримом, навколо чорні волокна, схожі на крила",chAlt2:"Колаж: Марія з татуюваннями серед червоних рослин під марсіанським небом з двома місяцями",chAlt3:"Марія в чорній скульптурній масці з шипами на червоному тлі, над нею логотип MADDER",lbClose:"Закрити",lbPrev:"Попереднє фото",lbNext:"Наступне фото",
 chLead:"Марія була музою і співавторкою мистецтва CHERNAMARS, а згодом стала співзасновницею студії MADDER.",
 chP1:"CHERNAMARS — художній всесвіт марсіанського футуризму. Разом з автором проєкту Марія уявляла, яким може бути той світ: його люди, їхні вірування і філософія, мистецтво, танці і сам спосіб рухатися. Частина цієї візуальної мови живе на її тілі, у татуюваннях, кожне з яких має власний унікальний дизайн.",
 chP2:"У студії MADDER концепція отримувала тіло в реальному світі: перформанси, татуювання, підготовка проєктів і системна робота над тим, щоб ідея ставала дедалі відчутнішою. Червоне і чорне, чуттєвість, відчуття гармонії, природи і духовного виміру людини: смак Марії багато в чому визначив характер цих проєктів.",
@@ -89,7 +88,6 @@ matEyebrow:"Materials",matTitle:"Movement <em>on camera</em>",gr1:"Choreography"
 gr3:"Trips",gr3d:"Study trips and training.",phVideo:"Video",phPhoto:"Photo",
 vid1Cap:"Choreography · @yaroslaava",vid1Label:"Maria dancing floor work on a dark stage in red light",vid2Label:"Maria dancing High Heels in a hall with arched windows",
 vPlay:"Play",vPause:"Pause",vSoundOn:"Turn sound on",vSoundOff:"Mute",
-artLabel:"Art · CHERNAMARS · MADDER",artTitle:"A world where movement became art",artOpen:"Open the story",artClose:"Close",chPhotos:"Photos from the projects",chAlt1:"Maria kneeling against red, her body covered in black and red paint, black fibres around her like wings",chAlt2:"Collage: Maria with her tattoos among red plants under a Martian sky with two moons",chAlt3:"Maria in a black sculptural mask with thorns against red, the MADDER logo above her",lbClose:"Close",lbPrev:"Previous photo",lbNext:"Next photo",
 chLead:"Maria was the muse and co-author of the CHERNAMARS art, and later co-founded the MADDER studio.",
 chP1:"CHERNAMARS is an artistic universe of Martian futurism. Together with the project's author, Maria imagined what that world could be: its people, their beliefs and philosophy, their art, their dances and their very way of moving. Part of this visual language lives on her body, in tattoos that each carry a unique design.",
 chP2:"At the MADDER studio the concept took on a body in the real world: performances, tattoos, preparing projects and systematic work to make the idea ever more tangible. Red and black, sensuality, a feeling for harmony, nature and the spiritual side of a person: Maria's taste shaped much of the character of these projects.",
@@ -199,46 +197,6 @@ addEventListener("resize",relayout);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(relayout);
 addEventListener("load",relayout);
 
-/* ---------- cadmium jungle: real image if present, painted stand-in otherwise ---------- */
-function paintJungle(){
-  const c=document.createElement("canvas"),w=1600,h=900;c.width=w;c.height=h;const g=c.getContext("2d");
-  let s=11;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
-  const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,"#2a0a0b");sky.addColorStop(.55,"#4a0f0e");sky.addColorStop(1,"#120405");g.fillStyle=sky;g.fillRect(0,0,w,h);
-  const sun=g.createRadialGradient(w*.72,h*.3,0,w*.72,h*.3,h*.7);sun.addColorStop(0,"rgba(255,170,120,.35)");sun.addColorStop(1,"rgba(255,170,120,0)");g.fillStyle=sun;g.fillRect(0,0,w,h);
-  const pal=["#b3121c","#d23a12","#e8641a","#8c0d14","#f08a24","#6e0a10"];
-  for(let layer=0;layer<4;layer++){
-    g.filter=`blur(${(3-layer)*2.2}px)`;const dark=.55+layer*.15;
-    for(let i=0;i<46-layer*6;i++){
-      const x=rnd()*w,top=h*(.05+rnd()*.5),bend=(rnd()-.5)*220,wd=2+rnd()*(4+layer*3);
-      g.strokeStyle=pal[Math.floor(rnd()*pal.length)];g.globalAlpha=dark*(.5+rnd()*.5);g.lineWidth=wd;g.lineCap="round";
-      g.beginPath();g.moveTo(x,h+20);g.bezierCurveTo(x+bend*.3,h*.7,x+bend,top+120,x+bend*.8,top);g.stroke();
-      const lx=x+bend*.8,ly=top;
-      for(let l=0;l<5+Math.floor(rnd()*5);l++){const ang=-Math.PI/2+(rnd()-.5)*2.6,len=40+rnd()*(90+layer*30);
-        g.fillStyle=pal[Math.floor(rnd()*pal.length)];g.globalAlpha=dark*(.45+rnd()*.45);
-        g.save();g.translate(lx,ly);g.rotate(ang);g.beginPath();g.ellipse(len/2,0,len/2,len*.12,0,0,6.283);g.fill();g.restore();}
-    }
-    g.filter=`blur(${(3-layer)*1.5}px)`;g.globalAlpha=.85;g.fillStyle="#090607";
-    for(let i=0;i<14;i++){const x=rnd()*w,y=h*(.45+rnd()*.55),r=18+rnd()*60;g.beginPath();g.ellipse(x,y,r*1.4,r,0,0,6.283);g.fill();}
-  }
-  g.filter="none";g.globalAlpha=1;
-  const floor=g.createLinearGradient(0,h*.75,0,h);floor.addColorStop(0,"rgba(18,4,5,0)");floor.addColorStop(1,"rgba(18,4,5,.9)");g.fillStyle=floor;g.fillRect(0,0,w,h);
-  return c.toDataURL("image/jpeg",.82);
-}
-const band=$("band"),panel=$("artPanel");
-function setJungle(url){$("bandBg").style.backgroundImage=`url("${url}")`;}
-const real=new Image();real.onload=()=>setJungle(real.src);real.onerror=()=>setJungle(paintJungle());real.src="/assets/images/cadmium-jungle.jpg";
-function setBand(open){$("artCard").classList.toggle("open",open);band.setAttribute("aria-expanded",String(open));panel.classList.toggle("open",open);$("bandHint").textContent=T[lang][open?"artClose":"artOpen"];}
-band.addEventListener("click",()=>setBand(band.getAttribute("aria-expanded")!=="true"));
-const lb=$("lb"),thumbs=[...document.querySelectorAll(".thumb")];let lbI=0,lbFrom=null;
-function lbShow(i){lbI=(i+thumbs.length)%thumbs.length;const t=thumbs[lbI],im=t.querySelector("img");
-  $("lbImg").src=t.dataset.full;$("lbImg").alt=im.alt;$("lbCap").textContent=im.alt;$("lbNum").textContent=`${lbI+1} / ${thumbs.length}`;}
-thumbs.forEach((t,i)=>t.addEventListener("click",()=>{lbFrom=t;lbShow(i);if(lb.showModal)lb.showModal();else lb.setAttribute("open","");$("lbClose").focus();}));
-$("lbPrev").addEventListener("click",()=>lbShow(lbI-1));$("lbNext").addEventListener("click",()=>lbShow(lbI+1));
-$("lbClose").addEventListener("click",()=>lb.close());
-lb.addEventListener("click",e=>{if(e.target===lb)lb.close();});
-lb.addEventListener("keydown",e=>{if(e.key==="ArrowLeft")lbShow(lbI-1);else if(e.key==="ArrowRight")lbShow(lbI+1);});
-lb.addEventListener("close",()=>{if(lbFrom)lbFrom.focus({preventScroll:true});});
-panel.addEventListener("transitionend",e=>{if(e.target===panel)relayout();});
 
 /* ---------- media: missing photos keep their placeholder; videos play while visible ---------- */
 document.querySelectorAll(".frame img").forEach(img=>{if(img.complete&&img.naturalWidth===0)img.remove();else img.addEventListener("error",()=>img.remove());});
@@ -321,12 +279,10 @@ $("editBtn").addEventListener("click",()=>{result.hidden=true;form.hidden=false;
 $("copyBtn").addEventListener("click",()=>{const ok=()=>{$("copied").textContent=T[lang].copied;};
   const fail=()=>{const r=document.createRange();r.selectNodeContents(msgEl);const s=getSelection();s.removeAllRanges();s.addRange(r);$("copied").textContent=T[lang].copyFail;};
   try{navigator.clipboard.writeText(msgEl.textContent).then(ok,fail);}catch(err){fail();}});
-$("collabLink").addEventListener("click",()=>{const r=$("dir-collab");r.checked=true;r.dispatchEvent(new Event("change",{bubbles:true}));});
 
 /* ---------- static text (both languages are pre-rendered per page; apply() just wires up dynamic parts) ---------- */
 function apply(l){lang=l;const d=T[l];
   document.querySelectorAll(".lang a,.foot-lang").forEach(b=>b.setAttribute("aria-current",String(b.dataset.lang===l)));
-  $("bandHint").textContent=d[band.getAttribute("aria-expanded")==="true"?"artClose":"artOpen"];
   vids.forEach(f=>f._sync&&f._sync());
   acctRefresh();
   if(form.dataset.tried)validate(false);
@@ -723,7 +679,7 @@ addEventListener("hashchange",admRoute);
 adm.addEventListener("close",()=>{admOk=false;if(location.hash==="#infinitylove"){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}});
 
 /* ----- media: no right-click save, no dragging, no iOS long-press save; materials carry a name watermark ----- */
-document.addEventListener("contextmenu",e=>{if(e.target.closest("img,video,.frame,.polaroid,.portrait,.thumb,.band,.lb,.protect"))e.preventDefault();});
+document.addEventListener("contextmenu",e=>{if(e.target.closest("img,video,.frame,.polaroid,.portrait,.protect"))e.preventDefault();});
 document.addEventListener("dragstart",e=>{if(e.target.closest("img,video"))e.preventDefault();});
 
 renderNav();initAuth();
