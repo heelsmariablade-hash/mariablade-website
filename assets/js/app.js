@@ -202,7 +202,7 @@ addEventListener("load",relayout);
 document.querySelectorAll(".frame img").forEach(img=>{if(img.complete&&img.naturalWidth===0)img.remove();else img.addEventListener("error",()=>img.remove());});
 const vids=[...document.querySelectorAll(".vid")];
 vids.forEach(fig=>{
-  const v=fig.querySelector("video"),pb=fig.querySelector('[data-act="play"]'),sb=fig.querySelector('[data-act="sound"]');
+  const v=fig.querySelector("video"),pb=fig.querySelector('[data-act="play"]'),sb=fig.querySelector('[data-act="sound"]'),eb=fig.querySelector('[data-act="expand"]');
   let held=reduce;
   const sync=()=>{const d=T[lang];pb.dataset.on=String(!v.paused);pb.setAttribute("aria-label",v.paused?d.vPlay:d.vPause);sb.dataset.on=String(!v.muted);sb.setAttribute("aria-label",v.muted?d.vSoundOn:d.vSoundOff);sb.setAttribute("aria-pressed",String(!v.muted));};
   fig._sync=sync;
@@ -212,8 +212,22 @@ vids.forEach(fig=>{
   v.addEventListener("error",fail);fig.querySelector("source:last-of-type").addEventListener("error",fail);
   pb.addEventListener("click",()=>{if(v.paused){held=false;tryPlay();}else{held=true;v.pause();}});
   sb.addEventListener("click",()=>{const on=v.muted;if(on)vids.forEach(o=>{const ov=o.querySelector("video");if(ov!==v)ov.muted=true;});v.muted=!on;if(on&&v.paused){held=false;tryPlay();}});
+  if(eb)eb.addEventListener("click",()=>openVideoLightbox(v));
   if("IntersectionObserver" in window)new IntersectionObserver(([e])=>{if(e.isIntersecting&&!held)tryPlay();else if(!e.isIntersecting)v.pause();},{threshold:.3}).observe(fig);
   sync();
+});
+
+/* ---------- video lightbox: moves the already-loaded <video> into a modal and back, no second copy is ever fetched ---------- */
+const vidLb=$("vidLb"),vidLbStage=$("vidLbStage");
+function openVideoLightbox(v){
+  v._vlbHome=v._vlbHome||{parent:v.parentNode,next:v.nextSibling};
+  v.controls=true;
+  vidLbStage.appendChild(v);
+  dlgOpen(vidLb);
+}
+vidLb.addEventListener("close",()=>{
+  const v=vidLbStage.querySelector("video");
+  if(v&&v._vlbHome){v.controls=false;v._vlbHome.parent.insertBefore(v,v._vlbHome.next);}
 });
 
 /* ---------- training ribbon: buttons, progress, drag ---------- */
