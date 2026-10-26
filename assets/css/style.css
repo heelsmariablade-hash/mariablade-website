@@ -538,6 +538,7 @@ dialog.dlg.closing .card{animation:cardOut .45s cubic-bezier(.4,0,.6,1) both}
 .mat p{margin:12px 0 0;color:var(--bone-soft);font-size:14.5px;line-height:1.65}
 .mat-media{position:relative;border-radius:14px;overflow:hidden;user-select:none;-webkit-user-select:none}
 .mat-media img{display:block;width:100%;pointer-events:none}
+.mat-media video{display:block;width:100%}
 .wm{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-family:var(--f-mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.16);transform:rotate(-22deg)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:400;transform:translateX(-50%);max-width:min(440px,calc(100vw - 32px));padding:12px 18px;border-radius:14px;
   background:#1a1718;color:var(--bone);font-size:13.5px;box-shadow:0 16px 40px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.08)}

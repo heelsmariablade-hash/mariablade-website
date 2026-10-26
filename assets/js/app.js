@@ -333,7 +333,8 @@ uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_prof
   requests:"Нові заявки",noRequests:"Нових заявок немає.",confirm:"Підтвердити",decline:"Відхилити",assign:"Призначити тренування",who:"Учениця",when:"Дата й час",add:"Додати",remove:"Прибрати",
   noSessions:"Немає занять.",addSlot:"Відкрити дату",noFree:"Вільних дат немає.",reply:"Відповісти",noMessages:"Повідомлень немає.",
   approve:"Опублікувати",unpublish:"Сховати",del:"Видалити",noReviews:"Відгуків немає.",
-  matTitle:"Назва",matText:"Текст",matImage:"Фото",addMat:"Додати матеріал",access:"Доступ",noStudents:"Ще немає учениць.",
+  matTitle:"Назва",matText:"Текст",matImage:"Фото або відео",addMat:"Додати матеріал",access:"Доступ",noStudents:"Ще немає учениць.",
+  matCompressing:"Стискаємо відео, зачекайте…",matUploading:"Завантажуємо…",
   eFill:"Заповніть поля.",done:"Готово"},
 en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and your line to Maria",sub_book:"Free dates and your requests",sub_study:"Sessions and attendance history",sub_knowledge:"Materials from Maria",sub_reviews:"A few words for Maria",sub_messages:"Direct messages with Maria",pData:"Personal details",pStatus:"Status",mailOk:"Your email is attached to the profile: Maria replies to it.",mailWhy:"Confirm your email to message Maria from your profile.",joinNote:"After you sign up, Maria sees your profile and grants you student status.",signIn:"Sign in",signUp:"Sign up",createAcc:"Create account",name:"Name",password:"Password",
   signupCheckEmail:"Check your email: we've sent a confirmation link.",
@@ -361,7 +362,8 @@ en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and 
   requests:"New requests",noRequests:"No new requests.",confirm:"Confirm",decline:"Decline",assign:"Assign a session",who:"Student",when:"Date and time",add:"Add",remove:"Remove",
   noSessions:"No sessions.",addSlot:"Open a date",noFree:"No free dates.",reply:"Reply",noMessages:"No messages.",
   approve:"Publish",unpublish:"Hide",del:"Delete",noReviews:"No reviews.",
-  matTitle:"Title",matText:"Text",matImage:"Photo",addMat:"Add material",access:"Access",noStudents:"No students yet.",
+  matTitle:"Title",matText:"Text",matImage:"Photo or video",addMat:"Add material",access:"Access",noStudents:"No students yet.",
+  matCompressing:"Compressing video, please wait…",matUploading:"Uploading…",
   eFill:"Fill in the fields.",done:"Done"}};
 const a=k=>A[lang][k]??k;
 
@@ -430,6 +432,49 @@ async function uploadMaterialImage(file){
   const base=(file.name||"image").replace(/\.[a-z0-9]+$/i,"").replace(/[^a-z0-9_.-]/gi,"_");
   const path=`${Date.now()}-${base}.${ext}`;
   const{error}=await supabase.storage.from("materials").upload(path,blob,{contentType:blob.type||file.type||"image/jpeg"});
+  return error?{ok:false,error}:{ok:true,path};
+}
+/* re-encodes a short clip at a capped resolution/bitrate via canvas+MediaRecorder (no server to transcode on);
+   skips very long sources and falls back to the original file on any unsupported browser / failure */
+async function compressVideo(file,{maxDim=1280,bitrate=1500000,maxDuration=180}={}){
+  let url;
+  try{
+    if(!window.MediaRecorder)throw new Error("no-mediarecorder");
+    const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(m=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m));
+    if(!mime)throw new Error("no-webm-support");
+    url=URL.createObjectURL(file);
+    const video=document.createElement("video");
+    video.muted=true;video.playsInline=true;video.preload="auto";video.src=url;
+    await new Promise((res,rej)=>{video.onloadedmetadata=res;video.onerror=()=>rej(new Error("decode-failed"));});
+    if(!video.duration||video.duration>maxDuration||!video.videoWidth)throw new Error("skip-too-long-or-unknown");
+    const scale=Math.min(1,maxDim/Math.max(video.videoWidth,video.videoHeight));
+    const cw=Math.max(2,Math.round(video.videoWidth*scale)),ch=Math.max(2,Math.round(video.videoHeight*scale));
+    const canvas=document.createElement("canvas");canvas.width=cw;canvas.height=ch;
+    const ctx=canvas.getContext("2d");
+    const stream=canvas.captureStream(30);
+    const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:bitrate});
+    const chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+    const stopped=new Promise(res=>{rec.onstop=res;});
+    let raf;const draw=()=>{ctx.drawImage(video,0,0,cw,ch);raf=requestAnimationFrame(draw);};
+    await new Promise((res,rej)=>{video.onplay=res;video.onerror=()=>rej(new Error("play-failed"));video.play().catch(rej);});
+    rec.start();draw();
+    await new Promise(res=>{video.onended=res;});
+    cancelAnimationFrame(raf);rec.stop();await stopped;
+    const blob=new Blob(chunks,{type:mime.split(";")[0]});
+    if(!blob.size)throw new Error("empty-output");
+    return blob.size<file.size?blob:file;
+  }catch{return file;}
+  finally{if(url)URL.revokeObjectURL(url);}
+}
+async function uploadMaterialVideo(file,onStatus){
+  if(onStatus)onStatus("compressing");
+  const blob=await compressVideo(file);
+  if(onStatus)onStatus(blob===file?null:"uploading");
+  const ext=blob===file?extOf(file):"webm";
+  const base=(file.name||"video").replace(/\.[a-z0-9]+$/i,"").replace(/[^a-z0-9_.-]/gi,"_");
+  const path=`${Date.now()}-${base}.${ext}`;
+  const{error}=await supabase.storage.from("materials").upload(path,blob,{contentType:blob.type||file.type||"video/mp4"});
+  if(onStatus)onStatus(null);
   return error?{ok:false,error}:{ok:true,path};
 }
 async function signedMaterialUrl(path){
@@ -518,8 +563,12 @@ knowledge:async u=>{if(!u.student)return lockHTML(a("studentOnly"),a("knowLock")
   const{data}=await supabase.from("materials").select("*, material_access!inner(student_id)").eq("material_access.student_id",u.id);
   const mats=data||[];
   if(!mats.length)return emptyNote(a("noMaterials"));
-  const cards=await Promise.all(mats.map(async m=>{const img=m.kind==="image"&&m.storage_path?await signedMaterialUrl(m.storage_path):"";
-    return `<article class="mat"><h4>${esc(m.title)}</h4>${img?`<div class="mat-media protect"><img src="${img}" alt="" draggable="false"><span class="wm">${esc(u.name)} · Maria Blade</span></div>`:""}<p>${esc(m.description||"").replace(/\n/g,"<br>")}</p></article>`;}));
+  const cards=await Promise.all(mats.map(async m=>{
+    const hasImg=m.kind==="image"&&m.storage_path,hasVid=m.kind==="video"&&m.storage_path;
+    const src=(hasImg||hasVid)?await signedMaterialUrl(m.storage_path):"";
+    const media=hasImg&&src?`<div class="mat-media protect"><img src="${src}" alt="" draggable="false"><span class="wm">${esc(u.name)} · Maria Blade</span></div>`
+      :hasVid&&src?`<div class="mat-media protect"><video src="${src}" controls playsinline controlsList="nodownload"></video><span class="wm">${esc(u.name)} · Maria Blade</span></div>`:"";
+    return `<article class="mat"><h4>${esc(m.title)}</h4>${media}<p>${esc(m.description||"").replace(/\n/g,"<br>")}</p></article>`;}));
   return `<div class="mats">${cards.join("")}</div>`;},
 reviews:async u=>{const{data}=await supabase.from("reviews").select("*").eq("student_id",u.id).order("created_at",{ascending:false});
   const mine=data||[];
@@ -599,7 +648,7 @@ knowledge:async()=>{
   const list=mats||[],grantRows=grants||[];
   return `<form id="matForm" novalidate><div class="field"><label class="lbl" for="mt-t">${a("matTitle")}</label><input type="text" id="mt-t" maxlength="120"></div>
   <div class="field"><label class="lbl" for="mt-x">${a("matText")}</label><textarea id="mt-x" rows="3" maxlength="4000"></textarea></div>
-  <div class="field"><label class="lbl" for="mt-i">${a("matImage")}</label><input type="file" id="mt-i" accept="image/*"></div>
+  <div class="field"><label class="lbl" for="mt-i">${a("matImage")}</label><input type="file" id="mt-i" accept="image/*,video/mp4,video/webm"></div>
   <div class="err" id="mtErr" role="alert"></div><button class="glass sm" type="submit">${a("addMat")}</button></form>
   <ul class="list" style="margin-top:22px">${list.map(m=>`<li class="item col"><div class="row" style="justify-content:space-between;width:100%"><strong>${esc(m.title)}</strong><button type="button" class="txt-btn" data-a="mat-del" data-id="${m.id}">${a("del")}</button></div>
     <div class="row"><span class="mono note">${a("access")}:</span>${students.length?students.map(u=>`<label class="chk"><input type="checkbox" data-a="grant" data-m="${m.id}" data-u="${u.id}" ${grantRows.some(g=>g.material_id===m.id&&g.student_id===u.id)?"checked":""}><span>${esc(u.full_name||"—")}</span></label>`).join(""):`<span class="note">${a("noStudents")}</span>`}</div></li>`).join("")}</ul>`;}
@@ -683,7 +732,17 @@ document.addEventListener("submit",async e=>{const f=e.target;if(!f.closest("dia
   if(f.classList.contains("replyForm")){const inp=f.querySelector("input"),t=inp.value.trim();if(!t)return;
     await supabase.from("messages").insert({sender_id:profileRow.id,recipient_id:f.dataset.id,body:t});renderAdm();return;}
   if(f.id==="matForm"){const t=val("mt-t"),x=val("mt-x"),file=$("mt-i").files[0];if(!t||(!x&&!file))return setE("mtErr","eFill");
-    let storagePath="",kind="article";if(file){const up=await uploadMaterialImage(file);if(up.ok){storagePath=up.path;kind="image";}}
+    const btn=f.querySelector('button[type="submit"]');
+    let storagePath="",kind="article";
+    if(file){
+      const isVideo=file.type.startsWith("video/");
+      if(btn)btn.disabled=true;
+      const up=isVideo
+        ?await uploadMaterialVideo(file,status=>setE("mtErr",status==="compressing"?"matCompressing":status==="uploading"?"matUploading":null))
+        :await uploadMaterialImage(file);
+      if(btn)btn.disabled=false;
+      if(up.ok){storagePath=up.path;kind=isVideo?"video":"image";}
+    }
     await supabase.from("materials").insert({title:t,description:x,storage_path:storagePath,kind,created_by:profileRow.id});renderAdm();return;}
 });
 
