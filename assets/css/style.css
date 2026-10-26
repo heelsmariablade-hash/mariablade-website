@@ -568,4 +568,6 @@ footer{padding-block:0 36px;color:var(--bone)}
 .foot-lang:hover{color:var(--bone)}
 .foot-lang:focus-visible{outline:2px solid #E2454D;outline-offset:3px}
 .proto{margin:0;font-size:11.5px;color:rgba(136,132,127,.7);max-width:70ch}
+.foot-credits{display:grid;gap:4px;justify-items:center}
+.made-by{opacity:.55}
 </content>
