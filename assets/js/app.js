@@ -333,7 +333,7 @@ uk:{acct:"Акаунт",acctEyebrow:"Особистий кабінет",sub_prof
   requests:"Нові заявки",noRequests:"Нових заявок немає.",confirm:"Підтвердити",decline:"Відхилити",assign:"Призначити тренування",who:"Учениця",when:"Дата й час",add:"Додати",remove:"Прибрати",
   noSessions:"Немає занять.",addSlot:"Відкрити дату",noFree:"Вільних дат немає.",reply:"Відповісти",noMessages:"Повідомлень немає.",
   approve:"Опублікувати",unpublish:"Сховати",del:"Видалити",noReviews:"Відгуків немає.",
-  matTitle:"Назва",matText:"Текст",matImage:"Фото або відео",addMat:"Додати матеріал",access:"Доступ",noStudents:"Ще немає учениць.",
+  matTitle:"Назва",matText:"Текст",matImage:"Фото або відео",matFilterOpt:"Застосувати фірмовий фільтр (червоний монохром)",addMat:"Додати матеріал",access:"Доступ",noStudents:"Ще немає учениць.",
   matCompressing:"Стискаємо відео, зачекайте…",matUploading:"Завантажуємо…",
   eFill:"Заповніть поля.",done:"Готово"},
 en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and your line to Maria",sub_book:"Free dates and your requests",sub_study:"Sessions and attendance history",sub_knowledge:"Materials from Maria",sub_reviews:"A few words for Maria",sub_messages:"Direct messages with Maria",pData:"Personal details",pStatus:"Status",mailOk:"Your email is attached to the profile: Maria replies to it.",mailWhy:"Confirm your email to message Maria from your profile.",joinNote:"After you sign up, Maria sees your profile and grants you student status.",signIn:"Sign in",signUp:"Sign up",createAcc:"Create account",name:"Name",password:"Password",
@@ -362,7 +362,7 @@ en:{acct:"Account",acctEyebrow:"Personal account",sub_profile:"Your details and 
   requests:"New requests",noRequests:"No new requests.",confirm:"Confirm",decline:"Decline",assign:"Assign a session",who:"Student",when:"Date and time",add:"Add",remove:"Remove",
   noSessions:"No sessions.",addSlot:"Open a date",noFree:"No free dates.",reply:"Reply",noMessages:"No messages.",
   approve:"Publish",unpublish:"Hide",del:"Delete",noReviews:"No reviews.",
-  matTitle:"Title",matText:"Text",matImage:"Photo or video",addMat:"Add material",access:"Access",noStudents:"No students yet.",
+  matTitle:"Title",matText:"Text",matImage:"Photo or video",matFilterOpt:"Apply brand filter (red-tinted monochrome)",addMat:"Add material",access:"Access",noStudents:"No students yet.",
   matCompressing:"Compressing video, please wait…",matUploading:"Uploading…",
   eFill:"Fill in the fields.",done:"Done"}};
 const a=k=>A[lang][k]??k;
@@ -426,8 +426,8 @@ async function uploadAvatar(file){
   await supabase.from("profiles").update({avatar_url:path}).eq("id",session.user.id);
   await loadProfile();return{ok:true};
 }
-async function uploadMaterialImage(file){
-  const blob=await compressImage(file,{maxDim:1920,quality:.82});
+async function uploadMaterialImage(file,tint=""){
+  const blob=await compressImage(file,{maxDim:1920,quality:.82,tint});
   const ext=blob===file?extOf(file):"jpg";
   const base=(file.name||"image").replace(/\.[a-z0-9]+$/i,"").replace(/[^a-z0-9_.-]/gi,"_");
   const path=`${Date.now()}-${base}.${ext}`;
@@ -649,6 +649,7 @@ knowledge:async()=>{
   return `<form id="matForm" novalidate><div class="field"><label class="lbl" for="mt-t">${a("matTitle")}</label><input type="text" id="mt-t" maxlength="120"></div>
   <div class="field"><label class="lbl" for="mt-x">${a("matText")}</label><textarea id="mt-x" rows="3" maxlength="4000"></textarea></div>
   <div class="field"><label class="lbl" for="mt-i">${a("matImage")}</label><input type="file" id="mt-i" accept="image/*,video/mp4,video/webm"></div>
+  <label class="chk"><input type="checkbox" id="mt-filter"><span>${a("matFilterOpt")}</span></label>
   <div class="err" id="mtErr" role="alert"></div><button class="glass sm" type="submit">${a("addMat")}</button></form>
   <ul class="list" style="margin-top:22px">${list.map(m=>`<li class="item col"><div class="row" style="justify-content:space-between;width:100%"><strong>${esc(m.title)}</strong><button type="button" class="txt-btn" data-a="mat-del" data-id="${m.id}">${a("del")}</button></div>
     <div class="row"><span class="mono note">${a("access")}:</span>${students.length?students.map(u=>`<label class="chk"><input type="checkbox" data-a="grant" data-m="${m.id}" data-u="${u.id}" ${grantRows.some(g=>g.material_id===m.id&&g.student_id===u.id)?"checked":""}><span>${esc(u.full_name||"—")}</span></label>`).join(""):`<span class="note">${a("noStudents")}</span>`}</div></li>`).join("")}</ul>`;}
@@ -739,7 +740,7 @@ document.addEventListener("submit",async e=>{const f=e.target;if(!f.closest("dia
       if(btn)btn.disabled=true;
       const up=isVideo
         ?await uploadMaterialVideo(file,status=>setE("mtErr",status==="compressing"?"matCompressing":status==="uploading"?"matUploading":null))
-        :await uploadMaterialImage(file);
+        :await uploadMaterialImage(file,$("mt-filter")?.checked?TINT_FILTER:"");
       if(btn)btn.disabled=false;
       if(up.ok){storagePath=up.path;kind=isVideo?"video":"image";}
     }

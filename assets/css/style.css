@@ -258,6 +258,11 @@ legend,.lbl{display:block;font-family:var(--f-mono);font-size:11px;letter-spacin
 .chips input{position:absolute;opacity:0;width:1px;height:1px}
 .chips .glass{padding:10px 16px;font-size:14px}
 .chips input:checked+.glass{--tint:linear-gradient(180deg,#c81824,#7a0911);--edge:rgba(255,124,112,.5);color:#fff;box-shadow:var(--rims),0 0 22px rgba(214,24,34,.42),0 6px 16px rgba(60,4,8,.28)}
+/* each option lights up a different shade — pale pink-red through scarlet to a pastel sunset orange */
+#dir-heels:checked+.glass{--tint:linear-gradient(180deg,#e8949a,#c45a62);--edge:rgba(255,189,193,.55);box-shadow:var(--rims),0 0 22px rgba(232,148,154,.4),0 6px 16px rgba(120,40,46,.26)}
+#dir-body:checked+.glass{--tint:linear-gradient(180deg,#d81f29,#8a0f16);--edge:rgba(255,124,112,.5);box-shadow:var(--rims),0 0 22px rgba(214,24,34,.42),0 6px 16px rgba(60,4,8,.28)}
+#dir-choreo:checked+.glass{--tint:linear-gradient(180deg,#e2552a,#a52c10);--edge:rgba(255,158,112,.5);box-shadow:var(--rims),0 0 22px rgba(226,85,42,.4),0 6px 16px rgba(90,24,4,.28)}
+#dir-collab:checked+.glass{--tint:linear-gradient(180deg,#f0a361,#c9712e);--edge:rgba(255,206,150,.55);box-shadow:var(--rims),0 0 22px rgba(240,163,97,.4),0 6px 16px rgba(110,54,10,.26)}
 .chips input:focus-visible+.glass{outline:2px solid var(--scarlet);outline-offset:3px}
 .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
 @media (max-width:620px){.row2{grid-template-columns:1fr}}
